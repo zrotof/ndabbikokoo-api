@@ -1,4 +1,4 @@
-# backend-starter-nodejs-typescript
+# backend-starter-nodejs
 The aim of this project is to provide a set of tools and configurations to facilitate the initialization and configuration of nodejs project with a simple architecture. It also contain other common dependencies listed bellow :
 
 - express js
