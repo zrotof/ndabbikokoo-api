@@ -23,6 +23,7 @@ To have it worked on your local machine you have to :
 - install dependencies
 - set correct parameter for the .env file
 - create rsa keys (by running a script located in scripts folder )
+- run migrations (by using package.json script part)
 - run seeders (by using package.json script part)
 - create first user (by running a script located in scripts folder )
 - launch the project with start script command located in package.json file
