@@ -139,15 +139,17 @@ exports.updateUser = async (userId, userData, roleNames) => {
 
     await userToEdit.update(userData, { transaction });
 
-    const roles = await models.Role.findAll({
-      where: {
-        name: roleNames,
-      },
-      transaction,
-    });
-
-    await userToEdit.setRoles(roles, { transaction });
-
+    if(roleNames){
+      const roles = await models.Role.findAll({
+        where: {
+          name: roleNames,
+        },
+        transaction,
+      });
+  
+      await userToEdit.setRoles(roles, { transaction });
+    }
+    
     await transaction.commit();
 
     return userToEdit;
