@@ -1,9 +1,16 @@
+const helmet = require('helmet');
 const express = require('express');
+const passport = require('passport');
 const cors = require('./cors');
 const bodyParser = require('body-parser');
 const config = require('./config/dot-env');
-
+const errorMiddleware = require('./middlewares/error-handler.middleware')
 const app = express();
+
+app.use(helmet());
+
+require('./config/passport')(passport);
+app.use(passport.initialize());
 
 app.use(express.json());
 app.use(bodyParser.json());
@@ -15,6 +22,8 @@ app.get("/", (req,res)=>{
 })
 
 app.use("/v1", cors.corsWithOptions, require('./routes'))
+
+app.use(errorMiddleware)
 
 app.listen(config.port, () => {
     console.log(`Listening on port : ${config.port}`)
