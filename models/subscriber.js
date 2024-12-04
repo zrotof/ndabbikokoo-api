@@ -1,0 +1,143 @@
+"use strict";
+const { Model } = require("sequelize");
+
+module.exports = (sequelize, DataTypes) => {
+  class Subscriber extends Model {
+    
+    getFullName() {
+      return [this.firstname, this.lastname].join(' ');
+    }
+
+    static associate(models) {
+      Subscriber.belongsTo(models.Group, { foreignKey: 'groupId' });
+
+      Subscriber.hasOne(models.User, { foreignKey: 'subscriberId' });
+      Subscriber.belongsToMany(models.User, { through: 'UserRoles', foreignKey: 'userId' });
+    }
+  }
+
+  Subscriber.init(
+    {
+      groupId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Groups',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
+      },
+      firstname: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: 'Veuillez renseigner votre/vos prénom(s) !'
+          }
+        } 
+      },
+      lastname: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: 'Veuillez renseigner votre/vos nom(s) !'
+          }
+        } 
+      },
+      marriedName: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      sex: {
+        type: DataTypes.ENUM('Femme', 'Homme'),
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Veuillez renseigner votre sexe !"
+          }
+        } 
+      },
+      address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Veuillez renseigner votre adresse !"
+          }
+        } 
+      },
+      postalCode: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Veuillez renseigner votre code postal !"
+          }
+        } 
+      },
+      country: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Veuillez renseigner votre pays !"
+          }
+        } 
+      },
+      town: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Veuillez renseigner votre ville !"
+          }
+        } 
+      },
+      phoneNumber: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Veuillez renseigner votre numéro de téléphone !"
+          }
+        } 
+      },
+      phoneCode: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: {
+            msg: "Veuillez renseigner le code indicatif de votre pays en selectionnant votre pays !"
+          }
+        } 
+      },
+      areStatusInternalRegulationsAndMembershipAgreementAccepted: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        validate: {
+          notEmpty: {
+            msg: "Veuillez accepter les statuts, le règlement intérieur et la convention d'adhésion de Mahol!"
+          }
+        } 
+      },
+      areRgpdConsentAccepted: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        validate: {
+          notEmpty: {
+            msg: "Veuillez reconnaitre avoir été informé(e) et avoir consentit au traitement de vos données dans la Politique de confidentialité de Mahol"
+          }
+        }
+      }
+    },
+    {
+      sequelize,
+      modelName: "Subscriber",
+    }
+  );
+  return Subscriber;
+};

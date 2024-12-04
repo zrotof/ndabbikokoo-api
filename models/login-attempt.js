@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       LoginAttempt.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
     }
   }
+  
   LoginAttempt.init(
     {
       userId: {

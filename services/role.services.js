@@ -1,5 +1,5 @@
 const { models } = require("../models");
-const { NotFoundError } = require('../utils/errors');
+const { NotFoundError, CustomError } = require('../utils/errors');
 
 exports.getRoles = async () => {
   try {
@@ -9,6 +9,56 @@ exports.getRoles = async () => {
     throw error;
   }
 };
+
+exports.getDefaultRole = async () => {
+  try {
+    return await models.Role.findOne({
+      where : {
+        name : "Member"
+      }
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
+exports.assignRolesToUser = async (userId, rolesId = [], transaction) => {
+  try {
+    const user = await models.User.findByPk(userId, {transaction});
+    
+    if (!user) {
+      throw new NotFoundError('Nous nous retouvons pas cet utilisateur');
+    }
+
+    
+    const rolesToAssign = await models.Role.findAll({
+      where: {
+        id: rolesId
+      },
+      transaction
+    });
+
+
+    const foundRoleIds = rolesToAssign.map(role => role.id);
+    const missingRoles = rolesId.filter(roleId => !foundRoleIds.includes(roleId));
+
+    if (missingRoles.length > 0) {
+      throw new NotFoundError("Attention! Vous essayer de créer un adhérent en lui assignant des roles inexistants");
+    }
+
+    if (rolesToAssign.length === 0) {
+
+      const defaultRole = await this.getDefaultRole();
+
+      rolesToAssign.push(defaultRole);
+    }
+
+    await user.addRoles(rolesToAssign, { transaction });
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}
 
 exports.createRole = async (roleData) => {
   try {

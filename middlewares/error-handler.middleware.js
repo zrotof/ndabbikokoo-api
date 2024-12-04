@@ -58,7 +58,7 @@ module.exports = (err, req, res, next) => {
     default:
       break;
   }
-
+  console.log(err);
   res.status(statusCode).json({
     status: "error",
     data: null,

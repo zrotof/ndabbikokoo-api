@@ -51,7 +51,7 @@ const createWebMaster = async () => {
       {
         from: o2switch.router,
         to: supraAdminEmail ,
-        subject: "PORTFOLIO : Votre mot de passe provisoire est: ",
+        subject: "MAHÒL : Votre mot de passe provisoire est: ",
         text: randomPassword
       }
     )

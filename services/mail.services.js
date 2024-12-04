@@ -5,7 +5,7 @@ const { validAccountTemplate, initChangePasswordTemplate, succeedChangePasswordT
 
 exports.sendVerificationEmail = async (name, email, token) => {
   try {
-    const subject = "PORTFOLIO : Activez votre compte";
+    const subject = "MAHÒL : Activez votre compte";
     const message = await validAccountTemplate(name, token);
 
     await transporter.sendMail({
@@ -21,7 +21,7 @@ exports.sendVerificationEmail = async (name, email, token) => {
 
 exports.sendInitChangePasswordEmail = async (name, email, token) => {
   try {
-    const subject = "PORTFOLIO : Changement de mot de passe";
+    const subject = "MAHÒL : Changement de mot de passe";
     const message = await initChangePasswordTemplate(name, token);
 
     await transporter.sendMail({
@@ -37,7 +37,7 @@ exports.sendInitChangePasswordEmail = async (name, email, token) => {
 
 exports.sendSuccessPasswordChangedEmail = async (name, email)=> {
   try {
-    const subject = "PORTFOLIO : Mot de passe modifié avec succès";
+    const subject = "MAHÒL : Mot de passe modifié avec succès";
     const message = await succeedChangePasswordTemplate(name);
 
     await transporter.sendMail({

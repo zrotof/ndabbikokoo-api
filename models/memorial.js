@@ -2,25 +2,14 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Memorial extends Model {
+
     static associate(models) {
-      User.belongsTo(models.Subscriber, { foreignKey: 'subscriberId' });
-      User.belongsToMany(models.Role, { through: 'UserRoles', foreignKey: 'userId' });
+      Memorial.belongsToMany(models.Role, { through: 'UserRoles', foreignKey: 'userId' });
     }
   }
-
-  User.init(
+  Memorial.init(
     {
-      subscriberId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'Subscribers',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL'
-      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -43,18 +32,14 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: {
             msg: 'Veuillez renseigner le mot de passe !'
           }
-        }
+        } 
       },
       canAuthenticate: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
       },
       isAccountValidated: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-      },
-      isEmailConfirmed: {
-        type: DataTypes.BOOLEAN,
+        type: DataTypes.STRING,
         defaultValue: false
       },
       salt: {
@@ -64,8 +49,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "User",
+      modelName: "Memorial",
     }
   );
-  return User;
+  return Memorial;
 };

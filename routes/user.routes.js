@@ -12,10 +12,12 @@ const {
   initPasswordReset,
   askEmailVerification,
   loginUser,
-  resetPassword
+  resetPassword,
+  validateSubscriber,
 } = require("../controllers/users.controller");
 
 router.post("", createUser);
+router.patch("/:id/validate", validateSubscriber);
 router.put("/:id", updateUser);
 router.post("/login", loginUser);
 router.delete("/:id", deleteUser);

@@ -28,6 +28,7 @@ const {
 } = require("../services/mail.services");
 
 const { getRemainingTime } = require("../utils/hour-convertion.utils");
+const { where } = require("sequelize");
 
 exports.getUsersWithRoles = async () => {
   try {
@@ -40,7 +41,7 @@ exports.getUsersWithRoles = async () => {
           model: models.Role,
           attributes: ["name"],
           through: { attributes: [] }, // Exclude join table attributes
-        },
+        }
       ],
     });
 
@@ -87,40 +88,19 @@ exports.getUserWithRolesById = async (userId) => {
   }
 };
 
-exports.createUserWithRoles = async (userData, roleNames) => {
-  const transaction = await sequelize.transaction(); // Démarrer une transaction
+exports.createUser = async (userDataToSave, transaction) => {
 
   try {
-    const hashedPassword = generateHashedPasswordAndSalt(userData.password);
+    const hashedPassword = generateHashedPasswordAndSalt(userDataToSave.password);
 
-    userData = {
-      ...userData,
+    userDataToSave = {
+      ...userDataToSave,
       password: hashedPassword.hash,
       salt: hashedPassword.salt,
     };
 
-    const newUser = await models.User.create(userData, { transaction });
-
-    const roles = await models.Role.findAll({
-      where: {
-        name: roleNames,
-      },
-      transaction,
-    });
-
-    await newUser.setRoles(roles, { transaction });
-
-    const expiresIn = "30m";
-    const token = await generateToken(newUser.id, expiresIn);
-    const name = newUser.getFullName();
-
-    await sendVerificationEmail(name, newUser.email, token);
-
-    await transaction.commit();
-
-    return newUser;
+    return await models.User.create(userDataToSave, { transaction });
   } catch (error) {
-    await transaction.rollback();
     throw error;
   }
 };
@@ -216,8 +196,6 @@ exports.loginUser = async (email, password, ipAddress) => {
         userId: user.id,
       },
     });
-
-    console.log()
 
     if(resetUserPassword){
       throw new CustomError("Vous ne pouvez vous connecter car une demande de changement de mot de passe est déjà en cours. Veuillez vérifier votre email pour le lien de réinitialisation de ce dernier.",403)
@@ -329,7 +307,7 @@ exports.validateUserEmailAccount = async (authHeader) => {
   try {
     if (!authHeader) {
       throw new CustomError(
-        "Il semble y avoir une erreur! Assurez-vous de bien cliquer sur le bouton de validation contenu dans le mail que vous avez reçu et veillez à ne pas modifier l'url de la page sur laquelle vous attérisez !",
+        "Il semble y avoir une erreur! Assurez-vous de bien cliquer sur le bouton de validation contenu dans le mail de vérification que vous avez reçu et veuillez à ne pas modifier l'url de la page sur laquelle vous attérisez!",
         401
       );
     }
@@ -350,16 +328,26 @@ exports.validateUserEmailAccount = async (authHeader) => {
 
     await jwt.verify(token, PUB_KEY, async (err, decoded) => {
       if (err) {
+
         if (err.name === "TokenExpiredError") {
           const decoded = jwt.decode(token);
           const userId = decoded.sub;
 
           try {
-            const user = await models.User.findByPk(userId);
+            const user = await models.User.findByPk(userId, {
+              include: [
+                {
+                  model: models.Subscriber,
+                  attributes: ['firstname']
+                }
+              ]
+            });
 
-            if (user.isAccountValidated) {
+            if (user.isEmailConfirmed) {
+              const firstname = user.Subscriber?.firstname;
+
               throw new CustomError(
-                `Nous sommes content de vous revoir ${user.firstname}, votre compte avait déjà été validé !`,
+                `Nous sommes content de vous revoir ${firstname}, votre compte avait déjà été validé !`,
                 200
               );
             }
@@ -380,16 +368,23 @@ exports.validateUserEmailAccount = async (authHeader) => {
       }
 
       const userId = decoded.sub;
-      const user = await models.User.findByPk(userId);
-
-      if (user.isAccountValidated === true) {
+      const user = await models.User.findByPk(userId, {
+        include: [
+          {
+            model: models.Subscriber,
+            attributes: ['firstname']
+          }
+        ]
+      });
+      
+      if (user.isEmailConfirmed === true) {
         throw new CustomError(
-          `Nous sommes content de vous revoir ${user.firstname}, votre compte avait déjà été validé !`,
+          `Nous sommes content de vous revoir ${user.Subscriber?.firstname}, votre compte a déjà été validé ! Vous pouvez vous connecter`,
           200
         );
       }
 
-      user.isAccountValidated = true;
+      user.isEmailConfirmed = true;
       user.save({ id: userId });
     });
   } catch (error) {
@@ -425,7 +420,14 @@ exports.askVerificationEmail = async (authHeader) => {
         if (err.name === "TokenExpiredError") {
           const decoded = jwt.decode(token);
           const userId = decoded.sub;
-          const user = await models.User.findByPk(userId);
+          const user = await models.User.findByPk(userId, {
+            include: [
+              {
+                model: models.Subscriber,
+                attributes: ['firstname']
+              }
+            ]
+          });
 
           if (!user) {
             throw new CustomError(
@@ -436,9 +438,9 @@ exports.askVerificationEmail = async (authHeader) => {
 
           const expiresIn = "30m";
           const newToken = await generateToken(user.id, expiresIn);
-          const name = user.getFullName();
+          const firstname = user.Subscriber?.firstname;
 
-          await sendVerificationEmail(name, user.email, newToken);
+          await sendVerificationEmail(firstname, user.email, newToken);
         } else {
           throw new CustomError(
             "Il semble y avoir une erreur! Veuillez contacter le web master!",
@@ -580,6 +582,42 @@ exports.resetPassword = async (authHeader, password) => {
       
       await sendSuccessPasswordChangedEmail(fullName, user.email)
     });
+  } catch (error) {
+    throw error
+  }
+}
+
+exports.validateSubscringRequest = async (subscriberId) => {
+  try { 
+    const user = await models.User.findOne({
+      where:{
+        subscriberId: subscriberId
+      },
+      attributes: ["id"],
+      include: [
+        {
+          model: models.Subscriber,
+          attributes : ["firstname", "lastname"]
+        }
+      ]
+    })
+
+    if(!user){
+      throw new NotFoundError("Il semble y avoir une erreur, l'adhérent que vous essayer de valider est inconnu. Veuillez re-essayer et si le problème persiste veuiller contacter le webmaster")
+    }
+
+    if(!user.isEmailConfirmed){
+      throw new CustomError("Attention, vous ne pouvez pas activer le compte de quelqu'un qui n'a pas encore validé son adresse mail !")
+    }
+
+    user.isAccountValidated = true;
+
+    user.save();
+    
+    const name = user.Subscriber?.lastname +" "+ user.Subscriber?.firstname
+
+    return name
+
   } catch (error) {
     throw error
   }

@@ -161,7 +161,7 @@ exports.validAccountTemplate = async (name, token) => {
         <p class="greeting">Cher(e) ${name},</p>
         <p>Votre compte a bien été créé et il ne vous reste plus qu'à le valider pour pouvoir y accéder. </p>
         <p>Pour ce faire, veuiller cliquer sur le bouton ci-après!</p>
-        <a class="token" href="${clientBaseUrl}/valider-email?token=${token}" target=blank> Valider votre compte </a>
+        <a class="token" href="${clientBaseUrl}/valider-email?token=${token}" target=blank> Je vérifie mon email </a>
         <p>
             <b>NB :</b> Si vous n'êtes pas à l'origine de la création de ce compte, écrivez-nous à l'adresse ${o2switch.contact} pour que nous supprimions ce compte.
         </p>

@@ -8,7 +8,8 @@ const {
   loginUser,
   askVerificationEmail,
   initPasswordReset,
-  resetPassword
+  resetPassword,
+  validateSubscringRequest
 } = require("../services/user.services");
 
 exports.getUsers = async (req, res, next) => {
@@ -204,4 +205,22 @@ exports.resetPassword = async (req, res, next) =>{
     catch(e){
         next(e)
     }
+}
+
+exports.validateSubscriber = async(req, res, next) => {
+  try {
+    const subscriberId = req.params.id;
+    
+    const response = await validateSubscringRequest(subscriberId)
+    
+    return res.status(201).json(
+      {
+          status : "success",
+          data : null,
+          message : `Le compte de ${response} a bien été validé !`
+      }
+  )
+  } catch (error) {
+    next(error)
+  }
 }

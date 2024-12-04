@@ -9,13 +9,15 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      lastname: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      firstname: {
-        type: Sequelize.STRING,
-        allowNull: false,
+      subscriberId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Subscribers',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL'
       },
       email: {
         type: Sequelize.STRING,
@@ -33,6 +35,10 @@ module.exports = {
       isAccountValidated: {
         type: Sequelize.BOOLEAN,
         defaultValue : false
+      },
+      isEmailConfirmed: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       salt: {
         type: Sequelize.STRING,

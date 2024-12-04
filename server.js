@@ -1,10 +1,11 @@
 const helmet = require('helmet');
 const express = require('express');
 const passport = require('passport');
-const cors = require('./cors');
 const bodyParser = require('body-parser');
+const cors = require('./cors');
 const config = require('./config/dot-env');
 const errorMiddleware = require('./middlewares/error-handler.middleware')
+
 const app = express();
 
 app.use(helmet());
@@ -25,6 +26,6 @@ app.use("/v1", cors.corsWithOptions, require('./routes'))
 
 app.use(errorMiddleware)
 
-app.listen(config.port, () => {
+app.listen(config.port || 3000 , () => {
     console.log(`Listening on port : ${config.port}`)
 });
