@@ -1,3 +1,5 @@
+const logger = require('../config/logger');
+
 const {
   AccountNotValidatedError,
   AuthenticationError,
@@ -58,7 +60,13 @@ module.exports = (err, req, res, next) => {
     default:
       break;
   }
-  console.log(err);
+
+  logger.error(err.message,{
+    stack: err.stack,
+    route: req.originalUrl,
+    method: req.method
+  });
+
   res.status(statusCode).json({
     status: "error",
     data: null,

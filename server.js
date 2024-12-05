@@ -1,16 +1,18 @@
-const helmet = require('helmet');
-const express = require('express');
-const passport = require('passport');
-const bodyParser = require('body-parser');
-const cors = require('./cors');
-const config = require('./config/dot-env');
-const errorMiddleware = require('./middlewares/error-handler.middleware')
+const helmet = require("helmet");
+const express = require("express");
+const passport = require("passport");
+const bodyParser = require("body-parser");
+const cors = require("./cors");
+const config = require("./config/dot-env");
+const loggerMiddleware = require("./middlewares/logger.middleware");
+const errorMiddleware = require("./middlewares/error-handler.middleware");
+const logger = require('./config/logger')
 
 const app = express();
 
 app.use(helmet());
 
-require('./config/passport')(passport);
+require("./config/passport")(passport);
 app.use(passport.initialize());
 
 app.use(express.json());
@@ -18,14 +20,16 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/", (req,res)=>{
-    res.send("Le monde chico et tout ce qu'il ya dedans")
-})
+app.use(loggerMiddleware);
 
-app.use("/v1", cors.corsWithOptions, require('./routes'))
+app.get("/", (req, res) => {
+  res.send("Le monde chico et tout ce qu'il ya dedans");
+});
 
-app.use(errorMiddleware)
+app.use("/v1", cors.corsWithOptions, require("./routes"));
 
-app.listen(config.port || 3000 , () => {
-    console.log(`Listening on port : ${config.port}`)
+app.use(errorMiddleware);
+
+app.listen(config.port || 3000, () => {
+  logger.info(`Le serveur écoute sur le port ${config.port || 3000}`);
 });

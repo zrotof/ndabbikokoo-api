@@ -4,6 +4,11 @@ const cors = require('cors');
 const whiteList = [
     'http://localhost:4200',
     'http://localhost:4201',
+    'https://test.maholdiaspora.com',
+    'https://www.test.maholdiaspora.com',
+    'https://www.test-admin.maholdiaspora.com',
+    'https://test-admin.maholdiaspora.com',
+    'https://www.test-admin.maholdiaspora.com'
 ];
 
 //Return true of false according to if the url calling the resources is known

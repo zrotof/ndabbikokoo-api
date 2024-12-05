@@ -211,6 +211,7 @@ exports.validateSubscriber = async(req, res, next) => {
   try {
     const subscriberId = req.params.id;
     
+    
     const response = await validateSubscringRequest(subscriberId)
     
     return res.status(201).json(

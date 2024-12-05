@@ -8,3 +8,6 @@ node_modules/
 
 # Directory for key files
 rsa-keys/
+
+# Logs directories
+logs/
