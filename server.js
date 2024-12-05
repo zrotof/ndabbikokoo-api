@@ -6,7 +6,8 @@ const cors = require("./cors");
 const config = require("./config/dot-env");
 const loggerMiddleware = require("./middlewares/logger.middleware");
 const errorMiddleware = require("./middlewares/error-handler.middleware");
-const logger = require('./config/logger')
+const logger = require('./config/logger');
+const { error } = require("winston");
 
 const app = express();
 

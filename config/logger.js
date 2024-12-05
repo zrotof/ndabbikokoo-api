@@ -5,7 +5,7 @@ const { environment } = require("./dot-env");
 
 const isDevelopment = environment === "development";
 
-const logsDir = isDevelopment ? "logs" : "/home/dmfm5155/logs/mahol/back";
+const logsDir = isDevelopment ? "logs" : "/home/dmfm5155/logs/mahol";
 
 const customFormat = winston.format.printf(
   ({ level, message, timestamp, ...meta }) => {
@@ -21,8 +21,8 @@ const customFormat = winston.format.printf(
 );
 
 const accessTransport = new winston.transports.DailyRotateFile({
-    dirname: 'logs/access',
-    filename: 'access-%DATE%.log',
+    dirname: logsDir+"/access",
+    filename: '%DATE%.log',
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true, // Compresse les logs anciens
     maxFiles: '14d',
@@ -30,8 +30,8 @@ const accessTransport = new winston.transports.DailyRotateFile({
   });
   
   const errorTransport = new winston.transports.DailyRotateFile({
-    dirname: 'logs/errors',
-    filename: 'error-%DATE%.log',
+    dirname: logsDir+"/errors",
+    filename: '%DATE%.log',
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true, // Compresse les logs anciens
     maxFiles: '30d',

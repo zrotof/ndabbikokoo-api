@@ -12,6 +12,7 @@ const {
   validateSubscringRequest
 } = require("../services/user.services");
 
+
 exports.getUsers = async (req, res, next) => {
   try {
     const users = await getUsersWithRoles();
@@ -210,7 +211,6 @@ exports.resetPassword = async (req, res, next) =>{
 exports.validateSubscriber = async(req, res, next) => {
   try {
     const subscriberId = req.params.id;
-    
     
     const response = await validateSubscringRequest(subscriberId)
     
