@@ -12,6 +12,23 @@ module.exports = (sequelize, DataTypes) => {
   
   Group.init(
     {
+      groupId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: {
+          msg: "Erreur lors de l'enrtegistrement veuillez contacter le web master !"
+        }
+      },
+      groupTypeId: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'GroupTypes',
+            key: 'id',
+          },
+          onUpdate: 'CASCADE',
+          onDelete: 'SET NULL',  
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,

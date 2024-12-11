@@ -64,9 +64,6 @@ module.exports = {
       updatedAt: new Date(),
     }], { returning: true });
 
-    // Get the userIds of the newly created users
-    const userId1 = users[0].id;
-    const userId2 = users[1].id;
 
     // Assume roles already exist and we will link them to the users
     // Query roles to get the roleIds for 'Admin' and 'Member'
@@ -83,13 +80,13 @@ module.exports = {
 
     // Check if the roles exist and link them to the users
     if (adminRoleId && memberRoleId) {
-      await queryInterface.bulkInsert('UserRoles', [{
-        userId: userId1,
+      await queryInterface.bulkInsert('SubscriberRoles', [{
+        subscriberId: subscriberId1,
         roleId: adminRoleId,
         createdAt: new Date(),
         updatedAt: new Date(),
       }, {
-        userId: userId2,
+        subscriberId: subscriberId2,
         roleId: memberRoleId,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -100,7 +97,7 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     // Remove all data if rolling back
-    await queryInterface.bulkDelete('UserRoles', null, {});
+    await queryInterface.bulkDelete('SubscriberRoles', null, {});
     await queryInterface.bulkDelete('Users', null, {});
     await queryInterface.bulkDelete('Subscribers', null, {});
   }

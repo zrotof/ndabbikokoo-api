@@ -3,11 +3,10 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class UserTokenPasswordReset extends Model {
-    
+  class SubscriberPasswordResetRequest extends Model {
   }
-  UserTokenPasswordReset.init({
-    userId: {
+  SubscriberPasswordResetRequest.init({
+    subscriberId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
@@ -17,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    modelName: 'UserTokenPasswordReset',
+    modelName: 'SubscriberPasswordResetRequest',
   });
-  return UserTokenPasswordReset;
+  return SubscriberPasswordResetRequest;
 };

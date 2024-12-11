@@ -22,14 +22,13 @@ exports.getDefaultRole = async () => {
   }
 }
 
-exports.assignRolesToUser = async (userId, rolesId = [], transaction) => {
+exports.assignRolesToSubscriber = async (subscriberId, rolesId = [], transaction) => {
   try {
-    const user = await models.User.findByPk(userId, {transaction});
+    const subscriber = await models.Subscriber.findByPk(subscriberId, {transaction});
     
-    if (!user) {
-      throw new NotFoundError('Nous nous retouvons pas cet utilisateur');
+    if (!subscriber) {
+      throw new NotFoundError('Nous nous retouvons pas cet adhérent');
     }
-
     
     const rolesToAssign = await models.Role.findAll({
       where: {
@@ -53,7 +52,7 @@ exports.assignRolesToUser = async (userId, rolesId = [], transaction) => {
       rolesToAssign.push(defaultRole);
     }
 
-    await user.addRoles(rolesToAssign, { transaction });
+    await subscriber.addRoles(rolesToAssign, { transaction });
     return true;
   } catch (error) {
     throw error;

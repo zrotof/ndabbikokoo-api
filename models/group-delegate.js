@@ -2,20 +2,20 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class AdminGroup extends Model {
+  class GroupDelegate extends Model {
     static associate(models) {
-      AdminGroup.belongsTo(models.Group, {
+      GroupDelegate.belongsTo(models.Group, {
         foreignKey: 'groupId'
       });
-      AdminGroup.belongsTo(models.Subscriber, {
-        foreignKey: 'adminId'
+      GroupDelegate.belongsTo(models.Subscriber, {
+        foreignKey: 'subscriberId'
       });
     }
   }
   
-  AdminGroup.init(
+  GroupDelegate.init(
     {
-      adminId: {
+      subscriberId: {
         type: DataTypes.STRING,
         allowNull: false
       },
@@ -26,8 +26,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "AdminGroup",
+      modelName: "GroupDelegate",
     }
   );
-  return AdminGroup;
+  return GroupDelegate;
 };

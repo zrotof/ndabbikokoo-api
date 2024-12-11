@@ -10,9 +10,8 @@ module.exports = (sequelize, DataTypes) => {
 
     static associate(models) {
       Subscriber.belongsTo(models.Group, { foreignKey: 'groupId' });
-
       Subscriber.hasOne(models.User, { foreignKey: 'subscriberId' });
-      Subscriber.belongsToMany(models.User, { through: 'UserRoles', foreignKey: 'userId' });
+      Subscriber.belongsToMany(models.Role, { through: 'SubscriberRoles', foreignKey: 'subscriberId' });
     }
   }
 

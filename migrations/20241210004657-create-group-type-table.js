@@ -2,22 +2,19 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UserTokenPasswordResets', {
+    await queryInterface.createTable('GroupTypes', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      userId: {
-        type: Sequelize.INTEGER,
+      name: {
+        type: Sequelize.STRING,
         allowNull: false,
-        unique: {
-          msg: 'Vous avez déjà reçu un mail vous permetant de modifier votre mot de passe !'
-        }
       },
-      token: {
-        type: Sequelize.TEXT,
+      description: {
+        type: Sequelize.STRING,
         allowNull: false
       },
       createdAt: {
@@ -31,6 +28,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UserTokenPasswordResets');
+    await queryInterface.dropTable('GroupTypes');
   }
 };

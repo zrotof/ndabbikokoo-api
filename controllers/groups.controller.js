@@ -31,9 +31,9 @@ exports.getGroupById = async (req, res, next) => {
 
 exports.createGroup = async (req, res, next) => {
   try {
-    const { name, country, town } = req.body;
+    const { name, country, town, groupTypeName } = req.body;
 
-    await groupService.createGroup({ name, country, town });
+    await groupService.createGroup({ name, country, town, groupTypeName });
 
     return res.status(201).json({
       status: "success",

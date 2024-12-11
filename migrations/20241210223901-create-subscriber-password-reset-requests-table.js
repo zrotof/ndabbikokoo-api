@@ -2,38 +2,29 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('LoginAttempts', {
+    await queryInterface.createTable('SubscriberPasswordResetRequests', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      userId: {
+      subscriberId: {
         type: Sequelize.INTEGER,
-        allowNull: true,
+        allowNull: false,
+        unique: {
+          msg: 'Vous avez déjà reçu un mail vous permetant de modifier votre mot de passe !'
+        },
         references: {
-          model: 'Users',
-          key: 'id'
+          model: 'Subscribers',
+          key: 'id',
         },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL'
+        onDelete: 'SET NULL',  
       },
-      ipAddress: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      attempts: {
-        type: Sequelize.INTEGER,
-        defaultValue: 1
-      },
-      blockUntil: {
-        type: Sequelize.BIGINT,
-        allowNull: true
-      },
-      blockDurationMultiplier: {
-        type: Sequelize.INTEGER,
-        defaultValue: 1
+      token: {
+        type: Sequelize.TEXT,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,
@@ -46,6 +37,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('LoginAttempts');
+    await queryInterface.dropTable('SubscriberPasswordResetRequests');
   }
 };

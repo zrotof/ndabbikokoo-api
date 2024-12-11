@@ -2,13 +2,14 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Staff extends Model {
     static associate(models) {
-      User.belongsTo(models.Subscriber, { foreignKey: 'subscriberId' });
+      Staff.belongsTo(models.Subscriber, { foreignKey: 'subscriberId' });
+      Staff.belongsToMany(models.Role, { through: 'StaffRoles', foreignKey: 'staffId' });
     }
   }
 
-  User.init(
+  Staff.init(
     {
       subscriberId: {
         type: DataTypes.INTEGER,
@@ -44,18 +45,6 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
-      canAuthenticate: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-      },
-      isAccountValidated: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-      },
-      isEmailConfirmed: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-      },
       salt: {
         type: DataTypes.STRING,
         allowNull: false
@@ -63,8 +52,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "User",
+      modelName: "Staff",
     }
   );
-  return User;
+  return Staff;
 };

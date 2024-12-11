@@ -44,12 +44,11 @@ exports.createSubscriber = async (req, res, next) => {
 
     const user = await userService.createUser(userToSave, transaction);
 
-    //console.log(user)
     //Assign roles to user
-    await roleService.assignRolesToUser(user.id, rolesId, transaction);
+    await roleService.assignRolesToSubscriber(subscriber.id, rolesId, transaction);
 
     //create token and send mail to subscriber
-    const expiresIn = "30m";
+    const expiresIn = "60m";
     const token = await generateToken(user.id, expiresIn);
     const name = subscriber.getFullName();
 
