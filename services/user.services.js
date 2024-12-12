@@ -607,13 +607,12 @@ exports.validateSubscringRequest = async (subscriberId) => {
       throw new NotFoundError("Il semble y avoir une erreur, l'adhérent que vous essayer de valider est inconnu. Veuillez re-essayer et si le problème persiste veuiller contacter le webmaster")
     }
 
-    console.log(user)
-
     if(!user.isEmailConfirmed){
       throw new CustomError("Attention, vous ne pouvez pas activer le compte de quelqu'un qui n'a pas encore vérifié son adresse mail !")
     }
 
     user.isAccountValidated = true;
+    user.canAuthenticate = true;
 
     user.save();
     

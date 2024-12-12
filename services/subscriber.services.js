@@ -25,11 +25,14 @@ class Subscriber{
                 include: [
                     {
                         model: models.User,
+                        as: 'user',
                         attributes: ['email', 'isEmailConfirmed',],
                         where : whereCondition
                     }
                 ]
             });
+
+            console.log(subscribersList)
 
             const subscribers = subscribersList.map(item => ({
                 id: item.id,
@@ -45,8 +48,8 @@ class Subscriber{
                 phoneCode: item.phoneCode,
                 createdAt: item.createdAt,
                 updatedAt: item.updatedAt,
-                email: item.User?.email,
-                isEmailConfirmed: item.User?.isEmailConfirmed
+                email: item.user?.email,
+                isEmailConfirmed: item.user?.isEmailConfirmed
             }));
 
             return subscribers;

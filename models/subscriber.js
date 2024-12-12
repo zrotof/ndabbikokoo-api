@@ -8,9 +8,9 @@ module.exports = (sequelize, DataTypes) => {
       return [this.firstname, this.lastname].join(' ');
     }
 
-    static associate(models) {
+    static associate(models) { 
       Subscriber.belongsTo(models.Group, { foreignKey: 'groupId' });
-      Subscriber.hasOne(models.User, { foreignKey: 'subscriberId' });
+      Subscriber.hasOne(models.User, { foreignKey: 'subscriberId', as: 'user', onDelete: 'CASCADE' });
       Subscriber.belongsToMany(models.Role, { through: 'SubscriberRoles', foreignKey: 'subscriberId' });
     }
   }
