@@ -4,7 +4,8 @@ module.exports = {
   environment: process.env.ENVIRONMENT,
   port: process.env.PORT || 4000,
   defaultBlockingTime: process.env.DEFAULT_BLOCKING_TIME,
-  maxLoginAttempts: process.env.MAX_LOGIN_ATTEMPTS,
+  maxFailedLoginAttempts: process.env.MAX_FAILED_LOGIN_ATTEMPTS,
+  tokenLifeTimeOnLogin : process.env.TOKEN_LIFE_TIME_ON_LOGIN,
   clientBaseUrl: process.env.CLIENT_BASE_URL,
   supraAdminEmail: process.env.SUPRA_ADMIN,
   db: {

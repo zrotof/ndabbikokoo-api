@@ -10,21 +10,44 @@ exports.getRoles = async () => {
   }
 };
 
-exports.getDefaultRole = async () => {
+exports.getRoleByCode = async (code) => {
   try {
-    return await models.Role.findOne({
-      where : {
-        name : "Member"
-      }
-    })
+    const role = await models.Role.findOne({
+      where: {code}
+    });
+
+    if (!role) {
+      throw new NotFoundError("Le rôle que vous cherchez est inconnu");
+    }
+
+    return role;
   } catch (error) {
-    throw error
+    throw error;
   }
 }
 
-exports.assignRolesToSubscriber = async (subscriberId, rolesId = [], transaction) => {
+exports.assignRolesToSubscriber = async (subscriberId, isGroupRepresentative, transaction) => {
   try {
     const subscriber = await models.Subscriber.findByPk(subscriberId, {transaction});
+
+    if (!subscriber) {
+      throw new NotFoundError('Nous nous retouvons pas cet adhérent');
+    }
+
+    const roleCode = isGroupRepresentative ? 'representative' : 'member';
+
+    const role = await this.getRoleByCode(roleCode);
+
+    await subscriber.addRoles(role, { transaction });
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.assignRolesToStaff = async (subscriberId, Ids = [], transaction) => {
+  try {
+    const subscriber = await models.Subscriber.findByPk(subscriberId);
     
     if (!subscriber) {
       throw new NotFoundError('Nous nous retouvons pas cet adhérent');
@@ -36,7 +59,6 @@ exports.assignRolesToSubscriber = async (subscriberId, rolesId = [], transaction
       },
       transaction
     });
-
 
     const foundRoleIds = rolesToAssign.map(role => role.id);
     const missingRoles = rolesId.filter(roleId => !foundRoleIds.includes(roleId));
@@ -57,7 +79,7 @@ exports.assignRolesToSubscriber = async (subscriberId, rolesId = [], transaction
   } catch (error) {
     throw error;
   }
-}
+};
 
 exports.createRole = async (roleData) => {
   try {

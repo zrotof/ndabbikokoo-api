@@ -1,10 +1,14 @@
 "use strict";
 const { Model } = require("sequelize");
+const { GroupTypeEnum } = require('../enums/group-type.enum');
 
 module.exports = (sequelize, DataTypes) => {
   class Group extends Model {
     static associate(models) {
       Group.hasMany(models.Subscriber, {
+        foreignKey: 'groupId', as: 'subscriber'
+      });
+      Group.hasMany(models.GroupStaff, {
         foreignKey: 'groupId'
       });
     }
@@ -12,22 +16,20 @@ module.exports = (sequelize, DataTypes) => {
   
   Group.init(
     {
-      groupId: {
+      maholGroupId: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: {
-          msg: "Erreur lors de l'enrtegistrement veuillez contacter le web master !"
+          msg: "Erreur lors de l'enregistrement veuillez contacter le web master !"
         }
       },
-      groupTypeId: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          references: {
-            model: 'GroupTypes',
-            key: 'id',
-          },
-          onUpdate: 'CASCADE',
-          onDelete: 'SET NULL',  
+      representativeId: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      groupType: {
+        type: DataTypes.ENUM(GroupTypeEnum.ASSOCIATION, GroupTypeEnum.STAFF),
+        allowNull: false
       },
       name: {
         type: DataTypes.STRING,
@@ -36,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: {
             msg: 'Veuillez renseigner le nom du groupe !'
           }
-        } 
+        }
       },
       country: {
         type: DataTypes.STRING,
@@ -45,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: {
             msg: 'Veuillez renseigner le pays où se trouve le groupe !'
           }
-        } 
+        }
       },
       town: {
         type: DataTypes.STRING,
@@ -54,7 +56,11 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: {
             msg: "Veuillez renseigner la ville où se trouve le grouve !"
           }
-        } 
+        }
+      },
+      isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true 
       }
     },
     {

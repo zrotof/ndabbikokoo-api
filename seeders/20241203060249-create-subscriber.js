@@ -5,6 +5,8 @@ const { generateHashedPasswordAndSalt } = require('../helpers/password.helpers')
 module.exports = {
   async up(queryInterface, Sequelize) {
     // Create two Subscribers
+
+  /*
     const subscribers = await queryInterface.bulkInsert('Subscribers', [{
       firstname: 'John',
       lastname: 'Doe',
@@ -92,7 +94,7 @@ module.exports = {
         updatedAt: new Date(),
       }]);
     }
-
+*/
   },
 
   async down(queryInterface, Sequelize) {

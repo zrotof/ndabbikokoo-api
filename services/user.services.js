@@ -4,6 +4,8 @@ const path = require("path");
 const crypto = require("crypto");
 const { defaultBlockingTime, supraAdminEmail } = require("../config/dot-env");
 
+const groupServices = require("./group.services");
+
 const {
   NotFoundError,
   CustomError,
@@ -57,19 +59,59 @@ exports.getUsersWithRoles = async () => {
   }
 };
 
-exports.getUserWithRolesById = async (userId) => {
+exports.getUserBySubscriberId = async (subscriberId) => {
   try {
-    const user = await models.User.findByPk(userId, {
-      attributes: {
-        exclude: ["password", "salt", "canAuthenticate", "isAccountValidated"],
+    const user = await models.User.findOne({
+      where:{
+        subscriberId: subscriberId
       },
+      attributes: ["id", "email", "isEmailConfirmed", "isAccountValidated"],
       include: [
         {
-          model: models.Role,
-          attributes: ["name"],
-          through: { attributes: [] }, // Exclude join table attributes
+          model: models.Subscriber,
+          attributes : ["firstname", "lastname"]
+        }
+      ]
+    })
+
+    if(!user){
+      throw new NotFoundError("Il semble y avoir une erreur, cet adhérent est inconnu. Veuillez re-essayer et si le problème persiste veuiller contacter le webmaster")
+    }
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+exports.getUserWithRolesById = async (userId) => {
+  try {
+
+    const user = await models.User.findByPk(userId, {
+      attributes: ["email", "createdAt"],
+      include: [
+        {
+          model: models.Subscriber,
+          as: 'subscriber',
+          attributes: [
+            "id","firstname", "lastname", "sex", "address", "postalCode", "country", "town", "phoneNumber", "phoneCode"
+          ],
+          include: [
+            {
+              model: models.Role,
+              as: 'roles',
+              through: {
+                attributes: [] // Exclure les colonnes de la table pivot
+              },
+              attributes: ['id', 'name'], // Inclure uniqu
+            },
+            {
+              model: models.Group,
+              as: 'group',
+              attributes: ['id', 'name'],
+            },
+          ],
         },
-      ],
+      ]
     });
 
     if (!user) {
@@ -78,12 +120,20 @@ exports.getUserWithRolesById = async (userId) => {
       );
     }
 
-    const userWithRoleNames = {
-      ...user.toJSON(),
-      roles: user.Roles.map((role) => role.name),
-    };
+    const { subscriber, ...rest } = user.toJSON();
+    const { roles, group, ...subscriberDetails } = subscriber;
+  
 
-    return userWithRoleNames;
+    const dataToRetrieve = {
+      subscriber: {
+        ...rest,
+        ...subscriberDetails
+      },
+      roles: roles ? [...roles] : [],
+      group: group ? {...group} : null
+    }
+
+    return dataToRetrieve;
   } catch (error) {
     throw error;
   }
@@ -327,6 +377,7 @@ exports.validateUserEmailAccount = async (authHeader) => {
     // The verifying public key
     const PUB_KEY = fs.readFileSync(pathToKey, "utf8");
 
+    let response
     await jwt.verify(token, PUB_KEY, async (err, decoded) => {
       if (err) {
 
@@ -387,7 +438,13 @@ exports.validateUserEmailAccount = async (authHeader) => {
 
       user.isEmailConfirmed = true;
       user.save({ id: userId });
-    });
+
+      response = { name: user.Subscriber?.firstname, email: user.email };
+    }
+  
+  );
+
+  return response;
   } catch (error) {
     throw error;
   }
@@ -588,39 +645,40 @@ exports.resetPassword = async (authHeader, password) => {
   }
 }
 
-exports.validateSubscringRequest = async (subscriberId) => {
-  try { 
-    const user = await models.User.findOne({
-      where:{
-        subscriberId: subscriberId
-      },
-      attributes: ["id", "isEmailConfirmed", "isAccountValidated"],
-      include: [
-        {
-          model: models.Subscriber,
-          attributes : ["firstname", "lastname"]
-        }
-      ]
-    })
-
-    if(!user){
-      throw new NotFoundError("Il semble y avoir une erreur, l'adhérent que vous essayer de valider est inconnu. Veuillez re-essayer et si le problème persiste veuiller contacter le webmaster")
+exports.checkIfAccountIsAlreadyValidated = async (isAccountValidated) => {
+  try {
+    if (isAccountValidated) {
+      throw new CustomError("Ce compte a déjà été validé !", 409);
     }
 
-    if(!user.isEmailConfirmed){
-      throw new CustomError("Attention, vous ne pouvez pas activer le compte de quelqu'un qui n'a pas encore vérifié son adresse mail !")
+    return isAccountValidated;
+  } catch (error) {
+    throw error;
+  }
+}
+
+exports.checkIfEmailIsConfirmed = async (isEmailConfirmed) => {
+  try {
+    if (!isEmailConfirmed) {
+      throw new CustomError(
+        "Attention, vous ne pouvez activer le compte de quelqu'un qui n'a pas encore vérifié son adresse mail !"
+      );
     }
+  } catch (error) {
+    throw error;
+  }
+}
 
-    user.isAccountValidated = true;
-    user.canAuthenticate = true;
+exports.validateUser = async (subscriberId, transaction) => {
+  try {
 
-    user.save();
-    
-    const name = user.Subscriber?.lastname +" "+ user.Subscriber?.firstname
-
-    return name
+    await models.User.update(
+      { isAccountValidated: true, canAuthenticate: true },
+      { where: { id: subscriberId } },
+      transaction
+    );
 
   } catch (error) {
-    throw error
+    throw error;
   }
 }

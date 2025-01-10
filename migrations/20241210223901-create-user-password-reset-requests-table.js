@@ -2,19 +2,28 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('GroupTypes', {
+    await queryInterface.createTable('UserPasswordResetRequests', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING,
+      userId: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        unique: {
+          msg: 'Vous avez déjà reçu un mail vous permetant de modifier votre mot de passe !'
+        },
+        references: {
+          model: 'Users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',  
       },
-      description: {
-        type: Sequelize.STRING,
+      token: {
+        type: Sequelize.TEXT,
         allowNull: false
       },
       createdAt: {
@@ -28,6 +37,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('GroupTypes');
+    await queryInterface.dropTable('UserPasswordResetRequests');
   }
 };

@@ -21,10 +21,6 @@ module.exports = (sequelize, DataTypes) => {
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL'
       },
-      ipAddress: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
       attempts: {
         type: DataTypes.INTEGER,
         defaultValue: 1

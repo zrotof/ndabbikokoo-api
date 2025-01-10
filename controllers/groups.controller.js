@@ -2,7 +2,9 @@ const groupService = require("../services/group.services");
 
 exports.getGroups = async (req, res, next) => {
   try {
-    const groups = await groupService.getGroups();
+    const queries = req.query;
+
+    const groups = await groupService.getGroups(queries);
 
     return res.status(201).json({
       status: "success",
@@ -13,6 +15,38 @@ exports.getGroups = async (req, res, next) => {
     next(e);
   }
 };
+
+exports.getGroupMembersByGroupId = async (req, res, next) => {
+  try {
+    const groupId = req.params.id;
+    const members = await groupService.getGroupMembersByGroupId(groupId);
+
+    return res.status(200).json({
+      status: "success",
+      data: members,
+      message: "Membres trouvés",
+    });
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+exports.getGroupBySubscriberId = async (req, res, next) => {
+  try {
+    const subscriberId = req.params.id;
+    const group = await groupService.getGroupBySubscriberId(subscriberId);
+
+    return res.status(200).json({
+      status: "success",
+      data: group,
+      message: "Groupe trouvé",
+    });
+    
+  } catch (error) {
+    next(error)
+  }
+}
 
 exports.getGroupById = async (req, res, next) => {
   try {
@@ -31,9 +65,9 @@ exports.getGroupById = async (req, res, next) => {
 
 exports.createGroup = async (req, res, next) => {
   try {
-    const { name, country, town, groupTypeName } = req.body;
+    const { name, country, town, groupType, isActive, representativeId } = req.body;
 
-    await groupService.createGroup({ name, country, town, groupTypeName });
+    await groupService.createGroup({ name, country, town, groupType, isActive, representativeId });
 
     return res.status(201).json({
       status: "success",
@@ -47,7 +81,7 @@ exports.createGroup = async (req, res, next) => {
 
 exports.updateGroup = async (req, res, next) => {
   const groupId = req.params.id;
-  const {newGroupData} = req.body;
+  const { newGroupData } = req.body;
 
   try {
     const result = await groupService.updateGroup(groupId, newGroupData);

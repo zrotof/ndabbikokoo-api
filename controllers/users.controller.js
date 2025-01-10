@@ -1,3 +1,4 @@
+const groupServices = require("../services/group.services");
 const {
   getUsersWithRoles,
   getUserWithRolesById,
@@ -9,9 +10,10 @@ const {
   askVerificationEmail,
   initPasswordReset,
   resetPassword,
-  validateSubscringRequest
+  validateSubscriber
 } = require("../services/user.services");
 
+const { sendSucceedEmailVerificationMailResponse } = require('../services/mail.services')
 
 exports.getUsers = async (req, res, next) => {
   try {
@@ -98,6 +100,7 @@ exports.deleteUser = async (req, res, next) => {
 exports.retrieveConnectedUser = async (req, res, next) => {
     try {
         const userId = req.user
+
         const user = await getUserWithRolesById(userId);
 
         return res.status(201).json({
@@ -120,11 +123,11 @@ exports.loginUser = async (req, res, next) => {
     const token = await loginUser(email,password,ipAddress);
 
     return res.status(200).json(
-        {
-            status : "success",
-            data : token,
-            message : "Connexion réussie !"
-        }
+      {
+        status : "success",
+        data : token,
+        message : "Connexion réussie !"
+      }
     )
 
   } catch (e) {
@@ -136,8 +139,12 @@ exports.verifyEmail = async (req, res, next) => {
   try {
     const authHeader = req.headers["authorization"];
 
-    await validateUserEmailAccount(authHeader);
+    const response = await validateUserEmailAccount(authHeader);
 
+    console.log(response);
+    
+    await sendSucceedEmailVerificationMailResponse(response.name, response.email);
+    
     return res.status(201).json({
       status: "success",
       data: "",
@@ -206,22 +213,4 @@ exports.resetPassword = async (req, res, next) =>{
     catch(e){
         next(e)
     }
-}
-
-exports.validateSubscriber = async(req, res, next) => {
-  try {
-    const subscriberId = req.params.id;
-    
-    const response = await validateSubscringRequest(subscriberId)
-    
-    return res.status(201).json(
-      {
-          status : "success",
-          data : null,
-          message : `Le compte de ${response} a bien été validé !`
-      }
-  )
-  } catch (error) {
-    next(error)
-  }
 }

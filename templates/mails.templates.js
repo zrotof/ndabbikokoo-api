@@ -1,15 +1,17 @@
 const { clientBaseUrl } = require("../config/dot-env");
 const { o2switch } = require('../config/dot-env');
 
-exports.changePasswordTemplate = async (name, token) => {
+exports.accountValidationTemplate = async (name) => {
+
   return `
    <html>
      <head>
        <style>
+         /* Your CSS styles go here */
           *{
             margin: 0;
             padding: 0;
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-family: Arial, sans-serif;
             box-sizing: border-box;
             -moz-box-sizing: border-box;
           }
@@ -44,19 +46,21 @@ exports.changePasswordTemplate = async (name, token) => {
      <body>
        <div class="container">
           <p>Cher(e) ${name},</p>
-          <p>Nous avons bien pris en compte votre désir de changer de mot de passe . Pour ce faire veuiller cliquer sur le bouton ci après.</p>
-          <a class="token" href="${clientBaseUrl}/changer-mot-de-passe?token=${token}" target=blank> Changer vore mot de passe </a>
           <p>
-            <b>NB :</b> Si vous n'êtes pas à l'origine de la création de ce compte, écrivez-nous à l'adresse contact@purs.cm pour que nous supprimions ce compte.
+          Votre compte a bien été validé par les administrateurs de Mahol. Vous pouvez désormais vous connecter et profiter de toutes les fonctionnalités de la plateforme.
           </p>
+          <a class="token" href="${clientBaseUrl}/se-connecter" target=blank> Se connecter </a>
+          
        </div>
- 
+  
      </body>
    </html>
- `;
-};
+  `;
+  
+  return htmlContent;
+  }
 
-exports.initChangePasswordTemplate = async (name, token) => {
+exports.passwordInitialisationRequestTemplate = async (name, token) => {
 
 return `
  <html>
@@ -115,7 +119,7 @@ return `
 return htmlContent;
 }
 
-exports.validAccountTemplate = async (name, token) => {
+exports.emailVerificationTemplate = async (name, token) => {
   return `
   <html>
     <head>
@@ -171,12 +175,102 @@ exports.validAccountTemplate = async (name, token) => {
 `;
 };
 
-exports.succeedChangePasswordTemplate = async(name) => {
-    return `
+exports.suceedEmailVerificationTemplate = async (name) => {
+  return `
   <html>
     <head>
       <style>
-        /* Your CSS styles go here */
+        *{
+          margin: 0;
+          padding: 0;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+          box-sizing: border-box;
+          -moz-box-sizing: border-box;
+        }
+        body {
+          background-color: #f2f2f2;
+        }
+        .container {
+          width: 100%;
+          margin: 0 auto;
+          padding: 20px 20px;          
+        }
+        p{
+          font-size: 15px;
+          line-height: 25px;
+        }
+        .greeting{
+          margin-bottom : 30px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <p class="greeting">Cher(e) ${name},</p>
+        <p>
+          Nous avons pu vérifier que vous êtes bienle propriétaire de l'adresse email que vous avez fournie.
+        </p>
+        <p>
+          Cependant, nous devons encore procédé à des vérifications des  informations que vus avez fournies lors de la création de votre compte. Une fois ces vérifications effectuées, vous recevrez un email vous informant de la validation de votre compte.
+        </p>
+        <p>
+            <b>NB :</b> Si vous n'êtes pas à l'origine de la création de ce compte, écrivez-nous à l'adresse ${o2switch.contact} pour que nous supprimions ce compte.
+        </p>
+      </div>
+    </body>
+  </html>
+`;
+};
+
+exports.groupAssignmentMailTemplate = async(subscriberName, groupName) => {
+  return `
+<html>
+  <head>
+    <style>
+      *{
+        margin: 0;
+        padding: 0;
+          font-family: Verdana, Geneva, Tahoma, sans-serif;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+      }
+      body {
+        background-color: #f2f2f2;
+      }
+      .container {
+        width: 100%;
+        margin: 0 auto;
+        padding: 20px 20px;          
+      }
+      .token{
+        display: block;
+        text-decoration: none;
+        font-size: 16px;
+        color: #fff !important;
+        font-weight: bold;
+        background-color : #7fbbd7;
+        padding: 10px 25px;
+        margin-bottom: 20px;
+        margin-top: 20px;
+        width: fit-content
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <p>Cher(e) ${subscriberName},</p>
+      <p>Vous faites désormais partie du groupe ${groupName}.</p>
+    </div>
+  </body>
+</html>
+`
+}
+
+exports.guestInvitationMailTemplate = async (firstname, lastname, email, groupName, representantName) => {
+  return `
+  <html>
+    <head>
+      <style>
         *{
           margin: 0;
           padding: 0;
@@ -208,16 +302,104 @@ exports.succeedChangePasswordTemplate = async(name) => {
     </head>
     <body>
       <div class="container">
-        <p>Cher(e) ${name},</p>
-        <p>Nous avons bien procédé à la modification de votre mot de passe, il ne vous reste plus qu'à vous connecter ! Pour ce faire vous pouvez cliquer sur le bouton ci après.</p>
-        <a class="token" href="${clientBaseUrl}/se-connecter" target=blank> Se connecter </a>
+        <p>Bonjour ${firstname} ${lastname},</p>
         <p>
-            <b>NB :</b> Si vous n'êtes pas à l'origine de la création de ce compte, écrivez-nous à l'adresse contact@purs.cm pour que nous supprimions ce compte.
+          Vous avez été invité(e) par ${representantName} à rejoindre le groupe ${groupName} sur notre plateforme Mahol. Ce groupe vous permettra de [bénéfices ou objectifs du groupe, par ex. : partager des idées, collaborer, accéder à des ressources exclusives].
+        </p>
+        <br>
+        <p>
+        Pour rejoindre le groupe, suivez ces étapes simples :
+        </p>
+        <ol>
+          <li>
+            Cliquez sur le bouton ci-dessous pour accéder à la page d'inscription.
+          </li>
+          <li>
+            Complétez le formulaire avec vos informations personnelles.
+          </li>
+          <li>
+            Une fois inscrit(e), vous serez automatiquement ajouté(e) au groupe ${groupName}.
+          </li>
+        </ol>
+
+        <a class="token" href="${clientBaseUrl}/nous-rejoindre/particulier?email=${email}&firstname=${firstname}&lastname=${lastname}" target=blank >Rejoindre le groupe</a>
+
+        <p>
+          Si vous avez des questions ou rencontrez des difficultés, contactez-nous à ${o2switch.contact}.
+        </p>
+        <p>
+          À très bientôt,
+        </p>
+        <br>
+        <p>
+          L’équipe Mahol
         </p>
       </div>
     </body>
   </html>
-`
+  `
 }
 
+exports.groupValidationMailTemplate = async (groupCreatorName, groupName) => {
+  return `
+  <html>
+    <head>
+      <style>
+        *{
+          margin: 0;
+          padding: 0;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+          box-sizing: border-box;
+          -moz-box-sizing: border-box;
+        }
+        body {
+          background-color: #f2f2f2;
+        }
+        .container {
+          width: 100%;
+          margin: 0 auto;
+          padding: 20px 20px;          
+        }
+        .token{
+          display: block;
+          text-decoration: none;
+          font-size: 16px;
+          color: #fff !important;
+          font-weight: bold;
+          background-color : #7fbbd7;
+          padding: 10px 25px;
+          margin-bottom: 20px;
+          margin-top: 20px;
+          width: fit-content
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <p>Bonjour ${groupCreatorName},</p>
+        <p>
+          Votre groupe ${groupName} a été validé par les administrateurs de Mahol. En vous connectant vous aurez la possibilité d'inviter des membres à rejoindre votre groupe. 
+        </p>
+        <br>
 
+        <a class="token" href="${clientBaseUrl}/se-connecter" target=blank >Se connecter</a>
+
+        <p>
+          Si vous avez des questions ou rencontrez des difficultés, contactez-nous à ${o2switch.contact}.
+        </p>
+        <p>
+          À très bientôt,
+        </p>
+        <br>
+        <p>
+          L’équipe Mahol
+        </p>
+      </div>
+    </body>
+  </html>
+  `
+}
+
+exports.succeedPasswordInitialisationTemplate = async() => {
+
+}

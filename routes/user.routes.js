@@ -12,11 +12,9 @@ const {
   initPasswordReset,
   askEmailVerification,
   loginUser,
-  resetPassword,
-  validateSubscriber,
+  resetPassword
 } = require("../controllers/users.controller");
 
-router.put("/:id/validate", validateSubscriber);
 router.put("/:id", updateUser);
 router.post("/login", loginUser);
 router.delete("/:id", deleteUser);
@@ -25,10 +23,9 @@ router.get("/ask-email-verification", askEmailVerification);
 router.post("/init-password-reset", initPasswordReset);
 router.post('/reset-password', passport.authenticate('jwt',{session:false}), resetPassword);
 router.post("", createUser);
-
 router.get(
   "/me",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("user-jwt", { session: false }),
   retrieveConnectedUser
 );
 router.get("/:id", getUserById);

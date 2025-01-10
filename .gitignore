@@ -11,3 +11,5 @@ rsa-keys/
 
 # Logs directories
 logs/
+
+.env

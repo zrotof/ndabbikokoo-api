@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         unique: {
-          msg: 'Ce rôle existe déjà !'
+          msg: 'Ce nom de rôle existe déjà !'
         },
         validate: {
           notEmpty: {
@@ -21,6 +21,19 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
+      code: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: {
+          msg: 'Ce code de rôle existe déjà !'
+        },
+        validate: {
+          notEmpty: {
+            msg: 'Veuillez renseigner le code du rôle !'
+          }
+        } 
+      },
+
       description: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -29,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
             msg: 'Veuillez renseigner la description !'
           }
         } 
-      },
+      }
     },
     {
       sequelize,

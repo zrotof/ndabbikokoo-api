@@ -1,29 +1,46 @@
-const { where } = require("sequelize");
 const { models, sequelize } = require("../models");
 const { NotFoundError, CustomError } = require("../utils/errors");
 const { generateMaholId } = require("../utils/generate-mahol-ids");
-const groupTypeService = require('../services/group-type.services')
 
 class GroupService {
-  async getGroups() {
+  async getGroups(queries) {
     try {
+
+      let whereCondition = {}
+
+      if(queries.groupType){
+        whereCondition = {
+          ...whereCondition,
+          groupType : queries.groupType
+        }
+      }
+
+      if(queries.isActive){
+          whereCondition = {
+              ...whereCondition,
+              isActive : queries.isActive === true || queries.isActive === 'true' 
+          }
+      }
+
       const groups = await models.Group.findAll({
         attributes: [
           "id",
           "name",
           "country",
           "town",
-          "groupId",
+          "maholGroupId",
+          "createdAt",
           [
             sequelize.fn("COUNT", sequelize.col("Subscribers.id")),
-            "subscriberCount",
+            "subscriberCount"
           ],
         ],
+        where : whereCondition,
         include: [
           {
             model: models.Subscriber,
             attributes: [],
-          },
+          }
         ],
         group: ["Group.id"],
       });
@@ -34,37 +51,91 @@ class GroupService {
     }
   }
 
+  async getGroupMembersByGroupId(id){
+    try {
+      const members = await models.Group.findByPk(id,{
+        include: [
+          {
+            model: models.Subscriber,
+            as: 'subscriber',
+            attributes: ['firstname', 'lastname', 'town', 'phoneCode', 'phoneNumber'],
+            include:{
+              model: models.User,
+              as: 'user',
+              attributes: ['email']
+            }
+          }
+        ]
+      });
+      
+      if (!members) {
+        throw new NotFoundError(
+          "Ce groupe est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !"
+        )
+      }
+
+      
+      const a = members.subscriber.map(mem => ({
+        lastname: mem.lastname,
+        firstname: mem.firstname,
+        phoneCode: mem.phoneCode,
+        phoneNumber: mem.phoneNumber,
+        town: mem.town,
+        email: mem.user.email
+      }))
+
+      return a;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getGroupById(groupId) {
     try {
       const group = await models.Group.findByPk(groupId);
-
+      
       if (!group) {
         throw new NotFoundError(
           "Ce groupe est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !"
-        );
+        )
       }
-
+      
       return group;
     } catch (error) {
       throw error;
     }
   }
 
-  async createGroup(groupDataToSave) {
+  async getGroupBySubscriberId(subscriberId) {
+    try {
+      const group = await models.Group.findOne({
+        where: {
+          representativeId: subscriberId
+        },
+      });
+
+      return group;
+      
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async createGroup(groupDataToSave, transaction) {
     try {
       const group = await models.Group.findOne({
         where: {
           name: groupDataToSave.name,
           country: groupDataToSave.country,
-          town: groupDataToSave.town,
-        },
-      });
+          town: groupDataToSave.town
+        }
+      })
 
-      if (group) {
+      if(group) {
         throw new CustomError(
           "Ce nom de groupe existe déjà, veuillez en renseigner un autre",
           409
-        );
+        )
       }
 
       const year = new Date().getFullYear();
@@ -78,24 +149,18 @@ class GroupService {
         }
       });
 
-      const groupId = generateMaholId(groupCount + 1, "GRP");
+      const maholGroupId = generateMaholId(groupCount + 1, "GRP");
 
       groupDataToSave = {
         ...groupDataToSave,
-        groupId: groupId,
-      };
+        maholGroupId: maholGroupId
+      }
 
-      const groupType = await groupTypeService.getGroupTypeByName(groupDataToSave.groupTypeName)
 
-      groupDataToSave = {
-        ...groupDataToSave,
-        groupId: groupId,
-        groupTypeId: groupType.id
-      };
-
-      const newGroup = await models.Group.create(groupDataToSave);
+      const newGroup = await models.Group.create(groupDataToSave, {transaction});
 
       return newGroup;
+
     } catch (error) {
       throw error;
     }
@@ -103,7 +168,6 @@ class GroupService {
 
   async updateGroup(groupId, newGroupData) {
     try {
-      console.log(groupId, newGroupData);
       const updatedRowCount = await models.Group.update(newGroupData, {
         where: { id: groupId },
       });
@@ -129,7 +193,7 @@ class GroupService {
       if (deletedGroup === 0) {
         throw new NotFoundError(
           "Le Groupe que vous essayez de supprimer est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !"
-        );
+        )
       }
 
       return true;
@@ -137,6 +201,42 @@ class GroupService {
       throw error;
     }
   }
+
+  async validateGroupIfExistBySubscriberId(subscriberId, transaction) {
+    try {
+
+      const response = {
+        isGroupRepresentative: false,
+        groupName: null,
+        groupId: null
+      };
+
+      const group = await models.Group.findOne({
+        where: {
+          representativeId: subscriberId
+        }
+      });
+
+      console.log(group);
+
+      if (group) {
+
+        if (group.isActive === false) {
+          group.isActive = true;
+          await group.save(transaction);
+        }
+
+        response.isGroupRepresentative = true;
+        response.groupName = group.name;
+        response.groupId = group.id;
+      }
+            
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+
 }
 
 module.exports = new GroupService();

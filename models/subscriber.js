@@ -9,9 +9,10 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     static associate(models) { 
-      Subscriber.belongsTo(models.Group, { foreignKey: 'groupId' });
+      Subscriber.belongsTo(models.Group, { foreignKey: 'groupId', as: 'group' });
       Subscriber.hasOne(models.User, { foreignKey: 'subscriberId', as: 'user', onDelete: 'CASCADE' });
-      Subscriber.belongsToMany(models.Role, { through: 'SubscriberRoles', foreignKey: 'subscriberId' });
+      Subscriber.belongsToMany(models.Role, { through: 'SubscriberRoles', foreignKey: 'subscriberId', as : 'roles' });
+      Subscriber.hasOne(models.Group, { foreignKey: 'representativeId', as: 'representative' });
     }
   }
 

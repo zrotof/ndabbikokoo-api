@@ -1,26 +1,24 @@
 const helmet = require("helmet");
 const express = require("express");
 const passport = require("passport");
-const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 const cors = require("./cors");
 const config = require("./config/dot-env");
 const loggerMiddleware = require("./middlewares/logger.middleware");
 const errorMiddleware = require("./middlewares/error-handler.middleware");
 const logger = require('./config/logger');
-const { error } = require("winston");
 
 const app = express();
 
-app.use(helmet());
 
 require("./config/passport")(passport);
-app.use(passport.initialize());
 
+
+app.use(cookieParser());
+app.use(helmet());
 app.use(express.json());
-app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(passport.initialize());
 app.use(loggerMiddleware);
 
 app.get("/", (req, res) => {
