@@ -3,6 +3,9 @@ const {
     TooManyAttemptsError
   } = require("../utils/errors");
   
+const { models } = require('../models')
+
+const { getRemainingTime } = require('../utils/hour-convertion.utils')
 
 class AuthHelpers {
   async resetLoginAttempts(user, attempts) {
@@ -12,12 +15,15 @@ class AuthHelpers {
   }
 
   // Helper: Handle blocked user
-  async handleBlockedUser(attempts) {
+  async handleBlockedUser(attempts, defaultBlockingTime) {
+    
     attempts.attempts += 1;
     attempts.blockDurationMultiplier += 1;
-    attempts.blockUntil =
+
+    attempts.blockUntil = 
       Date.now() +
-      1000 * 60 * defaultBlockingTime * attempts.blockDurationMultiplier;
+      1000 * 60 * defaultBlockingTime * (attempts.blockDurationMultiplier + attempts.attempts);
+
     await attempts.save();
 
     throw new TooManyAttemptsError(
@@ -33,7 +39,7 @@ class AuthHelpers {
     if (attempts) await attempts.destroy();
   }
 
-  async handleFailedLogin(user, attempts, maxFailedLoginAttempts) {
+  async handleFailedLogin(user, attempts, maxFailedLoginAttempts, defaultBlockingTime) {
     if (!attempts) {
       await models.LoginAttempt.create({
         userId: user.id,

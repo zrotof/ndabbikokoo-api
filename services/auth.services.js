@@ -63,7 +63,7 @@ class AuthService {
         if (isBlockDurationPassed) {
           await authHelpers.resetLoginAttempts(user, attempts);
         } else {
-          await authHelpers.handleBlockedUser(attempts);
+          await authHelpers.handleBlockedUser(attempts, defaultBlockingTime);
         }
       }
 

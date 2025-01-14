@@ -25,7 +25,7 @@ module.exports = {
       },
       blockUntil: {
         type: Sequelize.BIGINT,
-        allowNull: false,
+        allowNull: true,
       },
       blockDurationMultiplier: {
         type: Sequelize.INTEGER,

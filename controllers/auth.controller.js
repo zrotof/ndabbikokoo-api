@@ -1,4 +1,4 @@
-const { sequelize } = require("../models");
+const { models, sequelize } = require("../models");
 const { environment } = require('../config/dot-env')
 const { generateToken } = require("../utils/jwt.utils");
 

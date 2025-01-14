@@ -2,9 +2,11 @@ const router = require("express").Router();
 const passport = require("passport");
 
 const {
-  registerSubscriber
+  registerBeneficiary,
+  getBeneficiaryBySubscriberId
 } = require("../controllers/beneficiaries.controller");
 
-router.get("/:id", registerSubscriber);
+router.post("", registerBeneficiary);
+router.get("/:id", getBeneficiaryBySubscriberId);
 
 module.exports = router;

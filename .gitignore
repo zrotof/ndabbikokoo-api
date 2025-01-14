@@ -2,6 +2,7 @@
 node_modules/
 
 # Environment variables
+.env
 
 # OS-specific files
 .DS_Store
@@ -11,5 +12,3 @@ rsa-keys/
 
 # Logs directories
 logs/
-
-.env

@@ -85,8 +85,6 @@ class Subscriber {
         ]
       });
 
-      //console.log( subscriber );
-
       if (!subscriber) {
         return NotFoundError('Cet adhérent est inconnu.');
       }
