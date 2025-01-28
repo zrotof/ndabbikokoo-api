@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       Subscriber.hasOne(models.User, { foreignKey: 'subscriberId', as: 'user', onDelete: 'CASCADE' });
       Subscriber.belongsToMany(models.Role, { through: 'SubscriberRoles', foreignKey: 'subscriberId', as : 'roles' });
       Subscriber.hasOne(models.Group, { foreignKey: 'representativeId', as: 'representative' });
+      Subscriber.hasMany(models.Family, { foreignKey: 'subscriberId', as: 'families' });
     }
   }
 

@@ -9,6 +9,7 @@ const userService = require("../services/user.services");
 const subscriberService = require("../services/subscriber.services");
 const authService = require("../services/auth.services");
 const mailService = require("../services/mail.services");
+const staffService = require("../services/staff.services");
 
 
 exports.registerSubscriber = async (req, res, next) => {
@@ -19,13 +20,11 @@ exports.registerSubscriber = async (req, res, next) => {
     const {
       subscriberData,
       userData,
-      groupData,
-      guestsData
+      groupData
     } = req.body;
 
     let isGroupRepresentative = false;
       
-    //Save subscriber data
     const subscriber = await subscriberService.createSubscriber(
       subscriberData,
       userData.email,
@@ -52,17 +51,10 @@ exports.registerSubscriber = async (req, res, next) => {
         isActive: false
       };
 
-      const createdGroup = await groupService.createGroup(
+      await groupService.createGroup(
         groupToSave,
         transaction
       );
-
-
-
-      // If there are guests, save them to guest table
-      if (Array.isArray(guestsData) && guestsData?.length > 0) {
-        await guestService.bulkCreateGuest(createdGroup.id, guestsData, transaction);
-      }
     }
 
     //Assign roles to user
@@ -76,6 +68,7 @@ exports.registerSubscriber = async (req, res, next) => {
     const expiresIn = "60m";
     const token = await generateToken(user.id, expiresIn);
     const name = subscriber.getFullName();
+
 
     await mailService.sendEmailVerificationMailRequest(name, user.email, token);
 
@@ -103,6 +96,24 @@ exports.registerStaff = async (req, res, next) => {
   const transaction = await sequelize.transaction();
 
   try {
+    const { subscriberId, email, password, roles } = req.body;
+
+    const staffData = {email,password};
+
+    await subscriberService.getSubscriberById(subscriberId);
+
+    await staffService.createStaff(staffData, transaction)
+
+    await roleService.assignRolesToStaff();
+
+    await transaction.commit();
+
+    return res.status(201).json({
+      status: "success",
+      data: null,
+      message: `Membre du staff créé avec succès !`,
+    });
+
   } catch (error) {
     await transaction.rollback();
     next(error);

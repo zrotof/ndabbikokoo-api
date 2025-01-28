@@ -14,7 +14,7 @@ exports.getGroups = async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-};
+}
 
 exports.getGroupMembersByGroupId = async (req, res, next) => {
   try {
@@ -61,13 +61,23 @@ exports.getGroupById = async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-};
+}
 
 exports.createGroup = async (req, res, next) => {
   try {
-    const { name, country, town, groupType, isActive, representativeId } = req.body;
 
-    await groupService.createGroup({ name, country, town, groupType, isActive, representativeId });
+    const { name, country, town, isActive, representativeId } = req.body;
+
+    const groupDataToSave = {
+      name : name,
+      country: country,
+      town: town,
+      isActive: isActive ?? true,
+      isCreatedByMahol: !representativeId,
+      representativeId: representativeId ?? null
+    }
+
+    await groupService.createGroup(groupDataToSave);
 
     return res.status(201).json({
       status: "success",
@@ -77,13 +87,15 @@ exports.createGroup = async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-};
+}
 
 exports.updateGroup = async (req, res, next) => {
+
   const groupId = req.params.id;
   const { newGroupData } = req.body;
 
   try {
+
     const result = await groupService.updateGroup(groupId, newGroupData);
 
     return res.status(200).json({
@@ -94,9 +106,8 @@ exports.updateGroup = async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-};
+}
 
-//Delete user
 exports.deleteGroup = async (req, res, next) => {
   try {
     const groupId = req.params.id;
@@ -110,4 +121,4 @@ exports.deleteGroup = async (req, res, next) => {
   } catch (e) {
     next(e);
   }
-};
+}

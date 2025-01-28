@@ -1,6 +1,6 @@
 const { models, sequelize } = require("../models");
 const { NotFoundError, CustomError } = require("../utils/errors");
-const { generateMaholId } = require("../utils/generate-mahol-ids");
+const { generateRegistrationNumber } = require("../utils/generate-registration-number");
 
 class GroupService {
   async getGroups(queries) {
@@ -11,7 +11,7 @@ class GroupService {
       if(queries.groupType){
         whereCondition = {
           ...whereCondition,
-          groupType : queries.groupType
+          isCreatedByMahol : queries.isCreatedByMahol
         }
       }
 
@@ -28,10 +28,10 @@ class GroupService {
           "name",
           "country",
           "town",
-          "maholGroupId",
+          "groupRegistrationNumber",
           "createdAt",
           [
-            sequelize.fn("COUNT", sequelize.col("Subscribers.id")),
+            sequelize.fn("COUNT", sequelize.col("subscriber.id")),
             "subscriberCount"
           ],
         ],
@@ -39,6 +39,7 @@ class GroupService {
         include: [
           {
             model: models.Subscriber,
+            as: 'subscriber',
             attributes: [],
           }
         ],
@@ -138,24 +139,25 @@ class GroupService {
         )
       }
 
-      const year = new Date().getFullYear();
-
-      const groupCount = await models.Group.count({
-        where: {
-          createdAt: {
-            $gte: new Date(`${year}-01-01`),
-            $lte: new Date(`${year}-12-31`)
-          }
+      let uniqueRegistrationNumber;
+      let isUnique = false;
+  
+      // Ensure unique matricule by checking database
+      while (!isUnique) {
+        const registrationNumber = generateRegistrationNumber(7);
+        const existingGroup = await models.Group.findOne({ where: { groupRegistrationNumber: registrationNumber } });
+  
+        if (!existingGroup) {
+          uniqueRegistrationNumber = registrationNumber;
+          isUnique = true;
         }
-      });
-
-      const maholGroupId = generateMaholId(groupCount + 1, "GRP");
-
+      }
+  
+  
       groupDataToSave = {
         ...groupDataToSave,
-        maholGroupId: maholGroupId
+        groupRegistrationNumber: uniqueRegistrationNumber
       }
-
 
       const newGroup = await models.Group.create(groupDataToSave, {transaction});
 
@@ -168,11 +170,14 @@ class GroupService {
 
   async updateGroup(groupId, newGroupData) {
     try {
-      const updatedRowCount = await models.Group.update(newGroupData, {
-        where: { id: groupId },
+      
+      console.log(newGroupData);
+
+      const [updatedRowCount] = await models.Group.update(newGroupData, {
+        where: { id: groupId }
       });
 
-      if (updatedRowCount[0] === 0) {
+      if (updatedRowCount === 0) {
         throw new NotFoundError(
           "Le Groupe que vous essayez de modifier est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !"
         );

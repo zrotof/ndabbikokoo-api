@@ -83,6 +83,7 @@ exports.getUserBySubscriberId = async (subscriberId) => {
     throw error;
   }
 }
+
 exports.getUserWithRolesById = async (userId) => {
   try {
 
@@ -424,6 +425,7 @@ exports.validateUserEmailAccount = async (authHeader) => {
         include: [
           {
             model: models.Subscriber,
+            as: 'subscriber',
             attributes: ['firstname']
           }
         ]

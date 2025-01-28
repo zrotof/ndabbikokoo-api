@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       Staff.belongsToMany(models.Role, { through: 'StaffRoles', foreignKey: 'staffId' });
       Staff.hasMany(models.Group, { foreignKey: 'representativeId' });
       Staff.hasMany(models.GroupStaff, { foreignKey: 'staffId' });
+      Staff.hasMany(models.SolidarityAction, { foreignKey: 'staffId', as : 'solidariryActions' });
     }
   }
 

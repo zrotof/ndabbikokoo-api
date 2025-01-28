@@ -57,7 +57,10 @@ class MailService {
         subject: subject,
         html: message,
       });
+
+      
     } catch (error) {
+      console.log(error)
       throw error;
     }
   }

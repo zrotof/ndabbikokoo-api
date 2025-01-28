@@ -1,6 +1,5 @@
 "use strict";
 const { Model } = require("sequelize");
-const { GroupTypeEnum } = require('../enums/group-type.enum');
 
 module.exports = (sequelize, DataTypes) => {
   class Group extends Model {
@@ -16,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   
   Group.init(
     {
-      maholGroupId: {
+      groupRegistrationNumber: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: {
@@ -27,9 +26,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true
       },
-      groupType: {
-        type: DataTypes.ENUM(GroupTypeEnum.ASSOCIATION, GroupTypeEnum.STAFF),
-        allowNull: false
+      isCreatedByMahol: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
       },
       name: {
         type: DataTypes.STRING,

@@ -1,40 +1,34 @@
 const { models, sequelize } = require("../models");
 
-const {
-  NotFoundError,
-  CustomError
-} = require("../utils/errors");
+const { NotFoundError, CustomError } = require("../utils/errors");
 
 
-class BeneficiaryService {
+class FamilyService {
   
-  async getBeneficiaryBySubscriberId (id) {
+  async getFamilyMembersBySubscriberId(id) {
     try {
+      const families = await models.Family.findAll({ where: { subscriberId: id } });
   
-      const beneficiary = await models.Beneficiary.findOne({ where: { subscriberId: id } });
-  
-      if (!beneficiary) {
+      if (!families) {
         throw new CustomError(
-          "Vous n'avez pas encore déclaré de bénéficiaire."
-        )
+          "Il semble y avoir une erreur! Assurez-vous de bien cliquer sur le bouton de validation contenu dans le mail que vous avez reçu et veillez à ne pas modifier l'url de la page sur laquelle vous attérisez !",
+          401
+        );  
       }
   
-      return beneficiary;
-  
+      return families;
     } catch (e) {
       throw e;
     }
   }
 
-  async registerBeneficiary (beneficiaryToSave) {
+  async registerFamily (familyToSave) {
     try {
   
-      console.log(beneficiaryToSave);
-
       const subscriber = await models.Subscriber.findByPk(beneficiaryToSave.subscriberId);
 
       if (!subscriber) {
-        return new NotFoundError('Cet adhérent est inconnu.');
+        return new NotFoundError('Cet adhérent est inconnu .');
       }
 
       const beneficiary = await models.Beneficiary.create(beneficiaryToSave);
@@ -53,4 +47,4 @@ class BeneficiaryService {
   }
 }
 
-module.exports = new BeneficiaryService();
+module.exports = new FamilyService();

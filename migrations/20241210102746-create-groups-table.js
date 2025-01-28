@@ -1,5 +1,4 @@
 "use strict";
-const { GroupTypeEnum } = require('../enums/group-type.enum');
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -11,7 +10,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      maholGroupId: {
+      groupRegistrationNumber: {
         type: Sequelize.STRING,
         allowNull: false
       },
@@ -19,9 +18,9 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true
       },
-      groupType: {
-        type: Sequelize.ENUM(GroupTypeEnum.ASSOCIATION, GroupTypeEnum.STAFF),
-        allowNull: false
+      isCreatedByMahol: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
     },
       name: {
         type: Sequelize.STRING,

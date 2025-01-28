@@ -1,6 +1,8 @@
 "use strict";
 const { Model } = require("sequelize");
 
+const { SexEnum } = require("../enums/sex.enum");
+
 module.exports = (sequelize, DataTypes) => {
   class Beneficiary extends Model {
     static associate(models) {
@@ -30,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
       sex: {
-        type: DataTypes.ENUM('Femme', 'Homme'),
+        type: DataTypes.ENUM(SexEnum.WOMAN, SexEnum.MAN),
         allowNull: false,
         validate: {
           notEmpty: {
