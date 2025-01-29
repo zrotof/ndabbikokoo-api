@@ -2,7 +2,7 @@ const { o2switch } = require("./dot-env");
 const nodemailer = require('nodemailer');
 
 exports.transporter = nodemailer.createTransport({
-  host: "polski.o2switch.net",
+  host: "gavin.o2switch.net",
   port: 465,
   secure: true,
   auth: {

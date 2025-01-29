@@ -50,17 +50,15 @@ class MailService {
     try {
       const subject = "MAHÒL : Activez votre compte";
       const message = await emailVerificationTemplate(name, token);
-  
+        
       await transporter.sendMail({
         from: o2switch.router,
         to: email,
         subject: subject,
         html: message,
       });
-
       
     } catch (error) {
-      console.log(error)
       throw error;
     }
   }
@@ -97,7 +95,7 @@ class MailService {
     }
   }
 
-  async sendSuccessPasswordInitilaisationMailResponse (name, email) {
+  async sendSuccessPasswordResetMailResponse (name, email) {
     try {
       const subject = "MAHÒL : Mot de passe modifié avec succès";
       const message = await succeedPasswordInitialisationTemplate(name);

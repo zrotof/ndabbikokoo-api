@@ -140,8 +140,6 @@ exports.verifyEmail = async (req, res, next) => {
     const authHeader = req.headers["authorization"];
 
     const response = await validateUserEmailAccount(authHeader);
-
-    console.log(response);
     
     await sendSucceedEmailVerificationMailResponse(response.name, response.email);
     
@@ -197,9 +195,9 @@ exports.resetPassword = async (req, res, next) =>{
     try{
       const authHeader = req.headers["authorization"];
 
-        const { password } = req.body
+        const { token, password } = req.body
 
-        await resetPassword(authHeader, password);
+        await resetPassword(token, password);
 
         return res.status(201).json(
             {

@@ -171,8 +171,6 @@ class GroupService {
   async updateGroup(groupId, newGroupData) {
     try {
       
-      console.log(newGroupData);
-
       const [updatedRowCount] = await models.Group.update(newGroupData, {
         where: { id: groupId }
       });
@@ -221,8 +219,6 @@ class GroupService {
           representativeId: subscriberId
         }
       });
-
-      console.log(group);
 
       if (group) {
 

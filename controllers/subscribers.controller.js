@@ -119,35 +119,6 @@ exports.validateSubscriber = async (req, res, next) => {
       };
 
       await sendGroupValidationMailResponse(mailGroupValidationObject);
-
-      const guests = await guestService.getGuestsByGroupId(group.groupId);
-
-      if (guests.length > 0) {
-        const guestsMailObject = guests.map((guest) => ({
-          firstname: guest.firstname,
-          lastname: guest.lastname,
-          email: guest.email,
-          groupName: group.groupName,
-          representantName: subscriberFullName,
-        }));
-
-        guestsMailObject.forEach(async (guestMailObject) => {        
-          await sendGuestInvitationMailRequest(guestMailObject);
-        })
-      }
-    }
-
-    //If subscriber is a guest, we validate his account, assign him to his group using the group id in the guest table and delete him from the guest table after validation
-    const guest = await guestService.getGuestByEmail(subscriber.email);
-
-    if (guest) {
-      await models.Subscriber.update(
-        { groupId: guest.groupId },
-        { where: { id: subscriberId } },
-        {transaction}
-      );
-
-      await guestService.deleteGuestByEmail(subscriber.email, transaction);
     }
 
     await userService.validateUser(subscriberId, transaction);

@@ -65,10 +65,9 @@ exports.registerSubscriber = async (req, res, next) => {
     );
 
     //create token and send mail to subscriber
-    const expiresIn = "60m";
+    const expiresIn = "1h";
     const token = await generateToken(user.id, expiresIn);
     const name = subscriber.getFullName();
-
 
     await mailService.sendEmailVerificationMailRequest(name, user.email, token);
 

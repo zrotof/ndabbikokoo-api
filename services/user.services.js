@@ -25,8 +25,8 @@ const {
 
 const {
   sendVerificationEmail,
-  sendInitChangePasswordEmail,
-  sendSuccessPasswordChangedEmail,
+  sendPasswordInitilisationMailRequest,
+  sendSuccessPasswordResetMailResponse
 } = require("../services/mail.services");
 
 const { getRemainingTime } = require("../utils/hour-convertion.utils");
@@ -516,7 +516,18 @@ exports.askVerificationEmail = async (authHeader) => {
 
 exports.initPasswordReset = async (email) => {
   try {
-    const user = await models.User.findOne({where:{ email }});
+    const user = await models.User.findOne(
+      {
+        where:{ email },
+        include: [
+          {
+            model: models.Subscriber,
+            as: 'subscriber',
+            attributes: ["firstname", "lastname"],
+          }
+        ],
+      }
+    );
 
     if (!user) {
       throw new NotFoundError(
@@ -526,27 +537,27 @@ exports.initPasswordReset = async (email) => {
 
     let token;
 
-    const previousUserToken = await models.UserTokenPasswordReset.findOne({
+    const resetRequest = await models.UserPasswordResetRequest.findOne({
       where: {
         userId: user.id,
       },
     });
 
-    if (previousUserToken) {
-      const userToken = previousUserToken.token;
+    if (resetRequest) {
+      const userToken = resetRequest.token;
       const payload = verifyToken(userToken);
 
       if (payload) {
         token = userToken;
       } else {
-        await previousUserToken.destroy();
+        await resetRequest.destroy();
       }
     }
 
     if (!token) {
       const expiresIn = "1d";
       token = await generateToken(user.id, expiresIn);
-      const newUserToken = new models.UserTokenPasswordReset({
+      const newUserToken = new models.UserPasswordResetRequest({
         userId: user.id,
         token: token,
       });
@@ -562,29 +573,20 @@ exports.initPasswordReset = async (email) => {
     user.salt = newSalt;
     await user.save();
 
-    const fullname = user.getFullName();
+    const fullname = user.subscriber.getFullName();
 
-    await sendInitChangePasswordEmail(fullname, email, token);
+    await sendPasswordInitilisationMailRequest(fullname, email, token);
   } catch (error) {
     throw error;
   }
 };
 
-exports.resetPassword = async (authHeader, password) => {
+exports.resetPassword = async (resetPasswordToken, password) => {
 
   try {
-    if (!authHeader) {
-      throw new CustomError(
-        "Il semble y avoir une erreur! Assurez-vous de bien cliquer sur le bouton de validation contenu dans le mail que vous avez reçu et veillez à ne pas modifier l'url de la page sur laquelle vous attérisez !",
-        401
-      );
-    }
-
-    const resetPasswordToken = authHeader.split(" ")[1];
-
     if (!resetPasswordToken) {
       throw new CustomError(
-        "Il semble y avoir une erreur! Assurez-vous de bien cliquer sur le bouton de validation contenu dans le mail que vous avez reçu et veillez à ne pas modifier l'url de la page sur laquelle vous attérisez !",
+        "Il semble y avoir une erreur! Assurez-vous de bien cliquer sur le bouton contenu dans le mail que vous avez reçu et veillez à ne pas modifier l'url de la page sur laquelle vous attérisez !",
         401
       );
     }
@@ -611,7 +613,15 @@ exports.resetPassword = async (authHeader, password) => {
       }
 
       const userId = decoded.sub;
-      const user = await models.User.findByPk(userId);
+      const user = await models.User.findByPk(userId, {
+        include: [
+          {
+            model: models.Subscriber,
+            as: 'subscriber',
+            attributes: ["firstname", "lastname"],
+          },
+        ]
+      });
 
       if (!user) {
         throw new NotFoundError(
@@ -619,17 +629,16 @@ exports.resetPassword = async (authHeader, password) => {
         );
       }
 
-      const previousUserToken = await models.UserTokenPasswordReset.findOne({where:{userId}});
+      const resetPassword = await models.UserPasswordResetRequest.findOne({where:{userId}});
 
-      
-      if(!previousUserToken){
+      if(!resetPassword){
         throw new CustomError(
           "Il semble y avoir une erreur! Assurez-vous de bien cliquer sur le bouton de re-initialisation contenu dans le mail que vous avez reçu et veillez à ne pas modifier l'url de la page sur laquelle vous attérisez !",
           401
         );
       }
 
-      await previousUserToken.destroy();
+      await resetPassword.destroy();
 
       const saltHash = generateHashedPasswordAndSalt(password);
 
@@ -638,9 +647,9 @@ exports.resetPassword = async (authHeader, password) => {
 
       await user.save();
 
-      const fullName = user.getFullName(); 
+      const fullName = user.subscriber.getFullName(); 
       
-      await sendSuccessPasswordChangedEmail(fullName, user.email)
+      await sendSuccessPasswordResetMailResponse(fullName, user.email)
     });
   } catch (error) {
     throw error
