@@ -10,6 +10,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      subscriberRegistrationNumber:{
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       groupId: {
         type: Sequelize.INTEGER,
         allowNull: true,

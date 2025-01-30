@@ -238,7 +238,6 @@ class GroupService {
       throw error;
     }
   }
-
 }
 
 module.exports = new GroupService();

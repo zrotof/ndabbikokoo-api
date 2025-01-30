@@ -19,6 +19,13 @@ module.exports = (sequelize, DataTypes) => {
 
   Subscriber.init(
     {
+      subscriberRegistrationNumber: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: {
+          msg: "Erreur lors de l'enregistrement veuillez contacter le web master !"
+        }
+      },
       groupId: {
         type: DataTypes.INTEGER,
         allowNull: true,

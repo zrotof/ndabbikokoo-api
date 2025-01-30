@@ -4,6 +4,7 @@ const { CustomError, NotFoundError } = require("../utils/errors");
 const { isObjectEmpty } = require("../utils/parsing.utils");
 const groupServices = require("./group.services");
 const guestServices = require("./guest.services");
+const { generateRegistrationNumber } = require("../utils/generate-registration-number");
 
 class Subscriber {
   async getSubscribers(queries) {
@@ -29,7 +30,7 @@ class Subscriber {
           {
             model: models.User,
             as: "user",
-            attributes: ["email", "isEmailConfirmed","canAuthenticate"],
+            attributes: ["email", "isEmailConfirmed", "canAuthenticate"],
             where: whereCondition,
             required: true,
           },
@@ -43,6 +44,7 @@ class Subscriber {
 
       const subscribers = subscribersList.map((item) => ({
         id: item.id,
+        subscriberRegistrationNumber: item.subscriberRegistrationNumber,
         firstname: item.firstname,
         lastname: item.lastname,
         marriedName: item.marriedName,
@@ -59,7 +61,7 @@ class Subscriber {
         updatedAt: item.updatedAt,
         email: item.user?.email,
         isEmailConfirmed: item.user?.isEmailConfirmed,
-        isUserCanAuthenticate: item.user?.canAuthenticate
+        isUserCanAuthenticate: item.user?.canAuthenticate,
       }));
 
       return subscribers;
@@ -82,15 +84,17 @@ class Subscriber {
             as: "group",
             attributes: ["id", "name", "representativeId"],
           },
-        ]
+        ],
       });
 
       if (!subscriber) {
-        return NotFoundError('Cet adhérent est inconnu.');
+        return NotFoundError("Cet adhérent est inconnu.");
       }
-  
+
       // Compter le nombre total de membres dans le groupe
-      const totalMembers = await this.getGroupTotalSubscribers(subscriber.groupId);
+      const totalMembers = await this.getGroupTotalSubscribers(
+        subscriber.groupId
+      );
 
       const sub = {
         id: subscriber.id,
@@ -111,8 +115,9 @@ class Subscriber {
         groupId: subscriber.group?.id,
         groupName: subscriber.group?.name,
         groupTotalNumber: totalMembers,
-        isGroupRepresentative : subscriber.group?.representativeId === subscriber.id
-      }
+        isGroupRepresentative:
+          subscriber.group?.representativeId === subscriber.id,
+      };
 
       return sub;
     } catch (error) {
@@ -123,7 +128,7 @@ class Subscriber {
   async getGroupTotalSubscribers(groupId) {
     try {
       const totalSubscribers = await models.Subscriber.count({
-        where: { groupId }
+        where: { groupId },
       });
 
       return totalSubscribers;
@@ -144,7 +149,28 @@ class Subscriber {
         throw new CustomError(message, 409);
       }
 
-      return await models.Subscriber.create(subscriberData, { transaction });
+      let uniqueRegistrationNumber;
+      let isUnique = false;
+
+      // Ensure unique matricule by checking database
+      while (!isUnique) {
+        const registrationNumber = generateRegistrationNumber(7);
+        const existingGroup = await models.Subscriber.findOne({
+          where: { subscriberRegistrationNumber: registrationNumber }
+        });
+
+        if (!existingGroup) {
+          uniqueRegistrationNumber = registrationNumber;
+          isUnique = true;
+        }
+      }
+
+      const subscriberDataToSave = {
+        ...subscriberData,
+        subscriberRegistrationNumber: uniqueRegistrationNumber
+      }
+
+      return await models.Subscriber.create(subscriberDataToSave, { transaction });
     } catch (error) {
       throw error;
     }
@@ -152,10 +178,12 @@ class Subscriber {
 
   async updateSubscriberById(subscriberId, newSunbscriberData, transaction) {
     try {
-
-      const [updatedRowCount] = await models.Subscriber.update(newSunbscriberData, {
-        where: { id: subscriberId }
-      });
+      const [updatedRowCount] = await models.Subscriber.update(
+        newSunbscriberData,
+        {
+          where: { id: subscriberId },
+        }
+      );
 
       if (updatedRowCount === 0) {
         throw new NotFoundError(
