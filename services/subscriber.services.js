@@ -150,6 +150,25 @@ class Subscriber {
     }
   }
 
+  async updateSubscriberById(subscriberId, newSunbscriberData, transaction) {
+    try {
+
+      const [updatedRowCount] = await models.Subscriber.update(newSunbscriberData, {
+        where: { id: subscriberId }
+      });
+
+      if (updatedRowCount === 0) {
+        throw new NotFoundError(
+          "L'adhérent que vous essayez de modifier est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !"
+        );
+      }
+
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async deleteSubscriber(subscriberId) {
     try {
       const subscriber = await models.Subscriber.findByPk(subscriberId);

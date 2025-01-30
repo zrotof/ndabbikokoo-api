@@ -50,6 +50,24 @@ exports.getSubscriberById = async (req, res, next) => {
   }
 };
 
+exports.editSubscriberById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    const { newSubscriberData } = req.body;
+
+    await subscriberService.updateSubscriberById(id, newSubscriberData);
+
+    return res.status(200).json({
+      status: "success",
+      data: null,
+      message: "Utilisateur modifié avec succès !",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.deleteSubscriber = async (req, res, next) => {
   try {
     const clientId = req.params.id;

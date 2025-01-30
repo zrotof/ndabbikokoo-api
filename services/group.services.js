@@ -3,6 +3,7 @@ const { NotFoundError, CustomError } = require("../utils/errors");
 const { generateRegistrationNumber } = require("../utils/generate-registration-number");
 
 class GroupService {
+  
   async getGroups(queries) {
     try {
 
@@ -183,7 +184,7 @@ class GroupService {
 
       return true;
     } catch (error) {
-      throw error;
+      throw error
     }
   }
 
