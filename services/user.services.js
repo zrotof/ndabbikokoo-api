@@ -685,7 +685,7 @@ exports.validateUser = async (subscriberId, transaction) => {
 
     await models.User.update(
       { isAccountValidated: true, canAuthenticate: true },
-      { where: { id: subscriberId } },
+      { where: { subscriberId: subscriberId } },
       transaction
     );
 

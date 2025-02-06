@@ -6,12 +6,14 @@ const {
     createGroup,
     updateGroup,
     deleteGroup,
-    getGroupMembersByGroupId
+    getGroupMembersByGroupId,
+    getGroupWithMembersByGroupId
  } = require('../controllers/groups.controller')
 
 router.put('/:id', updateGroup);
 router.delete('/:id', deleteGroup);
 router.get('/:id/members', getGroupMembersByGroupId);
+router.get('/:id/all', getGroupWithMembersByGroupId);
 router.get('/:id', getGroupById);
 router.get('', getGroups);
 router.post('', createGroup);

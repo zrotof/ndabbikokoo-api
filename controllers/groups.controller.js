@@ -16,6 +16,22 @@ exports.getGroups = async (req, res, next) => {
   }
 }
 
+exports.getGroupWithMembersByGroupId = async (req, res, next) => {
+  try {
+    const groupId = req.params.id;
+    const groupWithMembers = await groupService.getGroupWithMembersByGroupId(groupId);
+
+    return res.status(200).json({
+      status: "success",
+      data: groupWithMembers,
+      message: "Membres trouvés",
+    });
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
 exports.getGroupMembersByGroupId = async (req, res, next) => {
   try {
     const groupId = req.params.id;

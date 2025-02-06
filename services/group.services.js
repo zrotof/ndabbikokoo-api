@@ -1,4 +1,5 @@
 const { models, sequelize } = require("../models");
+const subscriber = require("../models/subscriber");
 const { NotFoundError, CustomError } = require("../utils/errors");
 const { generateRegistrationNumber } = require("../utils/generate-registration-number");
 
@@ -48,6 +49,57 @@ class GroupService {
       });
 
       return groups;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getGroupWithMembersByGroupId(id){
+    try {
+      const groupWithMembers = await models.Group.findByPk(id,{
+        include: [
+          {
+            model: models.Subscriber,
+            as: 'subscriber',
+            attributes: ['id', 'subscriberRegistrationNumber', 'firstname', 'lastname', 'town', 'country', 'phoneCode', 'phoneNumber', 'phoneCode'],
+            include:{
+              model: models.User,
+              as: 'user',
+              attributes: ['email']
+            }
+          }
+        ]
+      });
+      
+      if (!groupWithMembers) {
+        throw new NotFoundError(
+          "Ce groupe est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !"
+        )
+      }
+
+      const b =  {
+        group: {
+          id: groupWithMembers.id,
+          name: groupWithMembers.name,
+          country: groupWithMembers.country,
+          town: groupWithMembers.town,
+          groupRegistrationNumber: groupWithMembers.groupRegistrationNumber,
+          createdAt: groupWithMembers.createdAt
+      },
+
+      subscribers: groupWithMembers.subscriber.map(mem => ({
+        subscriberRegistrationNumber: mem.subscriberRegistrationNumber,
+        lastname: mem.lastname,
+        firstname: mem.firstname,
+        phoneCode: mem.phoneCode,
+        phoneNumber: mem.phoneNumber,
+        town: mem.town,
+        email: mem.user.email,
+        isRepresentative : mem.id === groupWithMembers.representativeId
+      }))
+    }
+
+      return b;
     } catch (error) {
       throw error;
     }
