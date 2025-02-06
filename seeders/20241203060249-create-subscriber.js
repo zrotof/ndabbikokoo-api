@@ -56,15 +56,15 @@ module.exports = {
     const subscriberId1 = subscribers[0].id;
     const subscriberId2 = subscribers[1].id;
 
-    const passHash1 = generateHashedPasswordAndSalt("Admin");
-    const passHash2 = generateHashedPasswordAndSalt("Admin");
+    const passHash1 = generateHashedPasswordAndSalt("john");
+    const passHash2 = generateHashedPasswordAndSalt("jane");
     // Create two Users for the Subscribers
     await queryInterface.bulkInsert(
       "Users",
       [
         {
           subscriberId: subscriberId1,
-          email: "manduel21@gmail.com",
+          email: "john@maholdiaspora.com",
           password: passHash1.hash, // Be sure to hash the password before inserting
           canAuthenticate: true,
           isAccountValidated: true,
@@ -75,7 +75,7 @@ module.exports = {
         },
         {
           subscriberId: subscriberId2,
-          email: "jane.doe@example.com",
+          email: "jane@maholdiaspora.com",
           password: passHash2.hash, // Be sure to hash the password before inserting
           canAuthenticate: true,
           isAccountValidated: true,
