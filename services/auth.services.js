@@ -16,6 +16,7 @@ const {
 } = require("../utils/errors");
 
 
+
 const { generateToken, verifyToken } = require("../utils/jwt.utils");
 const { isPasswordValid } = require("../helpers/password.helpers");
 
@@ -67,7 +68,6 @@ class AuthService {
         }
       }
 
-
     const isValid = isPasswordValid(password, user.password, user.salt);
     if (!isValid) {
       await authHelpers.handleFailedLogin(user, attempts, maxFailedLoginAttempts, defaultBlockingTime);
@@ -83,6 +83,14 @@ class AuthService {
       throw e;
     }
   }
+
+  async isTokenValid (token) {
+    try {
+      return await verifyToken(token);
+    } catch (e) {
+      throw e;
+    }
+  } 
 
 }
 

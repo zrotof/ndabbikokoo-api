@@ -163,3 +163,21 @@ exports.loginStaff = async (req, res, next) => {
   }
 };
 
+exports.isTokenValid = async (req, res, next) => {
+  try {
+    const {token} = req.body;
+
+    const payload = await authService.isTokenValid(token)
+
+    return res.status(200).json(
+      {
+        status : "success",
+        data : payload,
+        message : "Connexion réussie !"
+      }
+    )
+  } catch (e) {
+    next(e)
+  }
+}
+

@@ -3,7 +3,6 @@ const { models, sequelize } = require("../models");
 class GuestService {
   async getGuestsByGroupId(groupId) {
     try {
-      
       const guests = await models.Guest.findAll({
         attributes: [
           "id",

@@ -20,5 +20,10 @@ module.exports = {
     router: process.env.O2SWITCH_USER_EMAIL_ROUTER,
     contact: process.env.O2SWITCH_USER_EMAIL_CONTACT,
     password: process.env.O2SWITCH_USER_PASSWORD_ROUTER
+  },
+  cloudinary : {
+    name : process.env.CLOUDINARY_NAME,
+    apiKey : process.env.CLOUDINARY_API_KEY,
+    apiSecret : process.env.CLOUDINARY_API_SECRET
   }
 }

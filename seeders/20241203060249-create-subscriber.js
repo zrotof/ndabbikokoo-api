@@ -48,6 +48,22 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          subscriberRegistrationNumber: registrationNumber2,
+          firstname: "Sidoine",
+          lastname: "Atangana",
+          sex: "Homme",
+          address: "456 Rue de Tankoua",
+          postalCode: "75000",
+          country: "France",
+          town: "Paris",
+          phoneNumber: "45678943",
+          phoneCode: "+33",
+          areStatusInternalRegulationsAndMembershipAgreementAccepted: true,
+          areRgpdConsentAccepted: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       { returning: true }
     );
@@ -55,9 +71,11 @@ module.exports = {
     // Get the subscriberIds of the newly created subscribers
     const subscriberId1 = subscribers[0].id;
     const subscriberId2 = subscribers[1].id;
+    const subscriberId3 = subscribers[2].id;
 
     const passHash1 = generateHashedPasswordAndSalt("john");
     const passHash2 = generateHashedPasswordAndSalt("jane");
+    const passHash3 = generateHashedPasswordAndSalt("test");
     // Create two Users for the Subscribers
     await queryInterface.bulkInsert(
       "Users",
@@ -84,6 +102,17 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          subscriberId: subscriberId3,
+          email: "test@maholdiaspora.com",
+          password: passHash3.hash, // Be sure to hash the password before inserting
+          canAuthenticate: true,
+          isAccountValidated: true,
+          isEmailConfirmed: true,
+          salt: passHash3.salt, // You should generate the salt programmatically
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
       ],
       {
         returning: true,
@@ -115,6 +144,12 @@ module.exports = {
         {
           subscriberId: subscriberId2,
           roleId: memberRoleId,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          subscriberId: subscriberId3,
+          roleId: adminRoleId,
           createdAt: new Date(),
           updatedAt: new Date(),
         },

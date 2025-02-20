@@ -114,9 +114,9 @@ class MailService {
   async sendGroupAssignmentMailResponse(mailObject){
     try {
       const subject = "MAHÒL : Affectation à un groupe";
-  
+        
       const message = await groupAssignmentMailTemplate(mailObject.subscriberName, mailObject.groupName);
-  
+
       await transporter.sendMail({
         from: o2switch.router,
         to: mailObject.subscriberEmail,

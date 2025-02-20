@@ -2,6 +2,11 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 
+const {
+AuthenticationError,
+InvalidCredentialsError
+} = require('../utils/errors')
+
 exports.generateToken = async (userId, expiresIn) => {
   try {
     const payload = {
@@ -27,13 +32,23 @@ exports.generateToken = async (userId, expiresIn) => {
 
 exports.verifyToken = async (token) => {
   try {
+    if(!token){
+      throw new AuthenticationError("No token provided", 401);
+    }
+
     const pathToKey = path.join(__dirname, "..", "rsa-keys", "id_rsa_pub.pem");
     const PUB_KEY = fs.readFileSync(pathToKey, "utf8");
 
-    // Verify the token with the provided secret key
-    const payload = jwt.verify(token, PUB_KEY);
+    const payload = await jwt.verify(token, PUB_KEY);
     return payload;
   } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new AuthenticationError("Token has expired", 401);
+    }
+    if (error instanceof jwt.JsonWebTokenError) {
+      throw new InvalidCredentialsError("Invalid token", 403);
+    }
+
     throw error;
   }
 };

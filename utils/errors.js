@@ -50,7 +50,6 @@ class InvalidCredentialsError extends Error {
   }
 }
 
-
 class NotFoundError extends CustomError {
   constructor(message = "Resource not found") {
     super(message);

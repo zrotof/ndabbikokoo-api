@@ -43,6 +43,7 @@ module.exports = (err, req, res, next) => {
       break;
 
     case err instanceof InvalidCredentialsError:
+      console.log("Error is here")
       statusCode = err.status; // Utiliser le statut de l'erreur personnalisée
       message = err.message;
       break;
