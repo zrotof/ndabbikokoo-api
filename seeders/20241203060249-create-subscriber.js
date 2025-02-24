@@ -7,10 +7,13 @@ const {
   generateRegistrationNumber,
 } = require("../utils/generate-registration-number");
 
+const SubscriberStatusEnum = require("../enums/subscriber-status.enum");
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     const registrationNumber1 = generateRegistrationNumber(6);
     const registrationNumber2 = generateRegistrationNumber(6);
+    const registrationNumber3 = generateRegistrationNumber(6);
 
     // Create two Subscribers
     const subscribers = await queryInterface.bulkInsert(
@@ -49,7 +52,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
-          subscriberRegistrationNumber: registrationNumber2,
+          subscriberRegistrationNumber: registrationNumber3,
           firstname: "Sidoine",
           lastname: "Atangana",
           sex: "Homme",
@@ -83,33 +86,36 @@ module.exports = {
         {
           subscriberId: subscriberId1,
           email: "john@maholdiaspora.com",
-          password: passHash1.hash, // Be sure to hash the password before inserting
+          password: passHash1.hash,
           canAuthenticate: true,
           isAccountValidated: true,
           isEmailConfirmed: true,
-          salt: passHash1.salt, // You should generate the salt programmatically
+          salt: passHash1.salt,
+          status: SubscriberStatusEnum.ENATTENTE,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
           subscriberId: subscriberId2,
           email: "jane@maholdiaspora.com",
-          password: passHash2.hash, // Be sure to hash the password before inserting
+          password: passHash2.hash,
           canAuthenticate: true,
           isAccountValidated: true,
           isEmailConfirmed: true,
-          salt: passHash2.salt, // You should generate the salt programmatically
+          salt: passHash2.salt,
+          status: SubscriberStatusEnum.DECEDE,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
           subscriberId: subscriberId3,
-          email: "test@maholdiaspora.com",
-          password: passHash3.hash, // Be sure to hash the password before inserting
+          email: "manduel21@gmail.com",
+          password: passHash3.hash,
           canAuthenticate: true,
           isAccountValidated: true,
           isEmailConfirmed: true,
-          salt: passHash3.salt, // You should generate the salt programmatically
+          salt: passHash3.salt,
+          status: SubscriberStatusEnum.ACTIF,
           createdAt: new Date(),
           updatedAt: new Date(),
         }

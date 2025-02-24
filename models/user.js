@@ -1,10 +1,13 @@
 "use strict";
 const { Model } = require("sequelize");
 
+const SubscriberStatusEnum = require("../enums/subscriber-status.enum");
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       User.belongsTo(models.Subscriber, { foreignKey: 'subscriberId', as : 'subscriber'});
+      User.hasMany(models.IdRequest, { foreignKey: 'userId', as : 'user'});
     }
   }
 
@@ -59,7 +62,11 @@ module.exports = (sequelize, DataTypes) => {
       salt: {
         type: DataTypes.STRING,
         allowNull: false
-      }
+      },
+      status: {
+        type: DataTypes.ENUM(...Object.values(SubscriberStatusEnum)),
+        defaultValue: SubscriberStatusEnum.ENATTENTE
+      },
     },
     {
       sequelize,

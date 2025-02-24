@@ -1,7 +1,7 @@
 "use strict";
 
 const { Model } = require("sequelize");
-const imageableTypes = require("../enums/imageable-types.enum");
+const ImageableTypesEnum = require("../enums/imageable-types.enum");
 
 module.exports = (sequelize, DataTypes) => {
   class Image extends Model {
@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       imageableType: {
-        type: DataTypes.ENUM(...Object.values(imageableTypes)),
+        type: DataTypes.ENUM(...Object.values(ImageableTypesEnum)),
         allowNull: false,
       },
     },

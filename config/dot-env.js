@@ -6,6 +6,7 @@ module.exports = {
   defaultBlockingTime: process.env.DEFAULT_BLOCKING_TIME,
   maxFailedLoginAttempts: process.env.MAX_FAILED_LOGIN_ATTEMPTS,
   tokenLifeTimeOnLogin : process.env.TOKEN_LIFE_TIME_ON_LOGIN,
+  tokenLifeTimeOnIdRequest : process.env.TOKEN_LIFE_TIME_ON_ID_REQUEST,
   clientBaseUrl: process.env.CLIENT_BASE_URL,
   supraAdminEmail: process.env.SUPRA_ADMIN,
   db: {
@@ -19,7 +20,8 @@ module.exports = {
   o2switch: {
     router: process.env.O2SWITCH_USER_EMAIL_ROUTER,
     contact: process.env.O2SWITCH_USER_EMAIL_CONTACT,
-    password: process.env.O2SWITCH_USER_PASSWORD_ROUTER
+    password: process.env.O2SWITCH_USER_PASSWORD_ROUTER,
+    idReceiver: process.env.O2SWITCH_USER_EMAIL_ID_RECEIVER
   },
   cloudinary : {
     name : process.env.CLOUDINARY_NAME,

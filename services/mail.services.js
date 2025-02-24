@@ -1,5 +1,7 @@
 const { transporter } = require("../config/mail-transporter");
 const { o2switch } = require("../config/dot-env");
+const fs = require('fs');
+const path = require('path');
 
 const { 
   accountValidationTemplate,
@@ -9,7 +11,9 @@ const {
   succeedPasswordInitialisationTemplate,
   groupAssignmentMailTemplate,
   guestInvitationMailTemplate,
-  groupValidationMailTemplate
+  groupValidationMailTemplate,
+  idRequestTemplate,
+  identicationWithAttachmentsMailTemplate
 } = require("../templates/mails.templates");
 
 class MailService {
@@ -163,6 +167,48 @@ class MailService {
       });
     } catch (error) {
       throw error;
+    }
+  }
+
+  async sendEmailIdRequest(name, token, subscriberEmail) {
+    try {
+      const subject = `MAHÒL : Vérification de votre identité`;
+  
+      const message = await idRequestTemplate(name, token)
+
+      await transporter.sendMail({
+        from: o2switch.router,
+        to: subscriberEmail,
+        subject: subject,
+        html: message
+      });
+
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async sendEmailIdenticationWithAttachments(mailObject){
+    try {
+      const fullName = mailObject.lastname+ " "+mailObject.firstname;
+      const subject = `Transmission pièce d'identification de ${fullName}`;
+
+      const message = await identicationWithAttachmentsMailTemplate(fullName, mailObject.email, mailObject.subscriberRegistrationNumber, mailObject.identificationType)
+
+      await transporter.sendMail({
+        from: o2switch.router,
+        to: o2switch.idReceiver,
+        subject: subject,
+        html: message,
+        attachments: mailObject.files.map((file) => ({
+          filename: file.originalname,
+          content: file.buffer,          
+          contentType: file.mimetype
+        }))
+      });
+
+    } catch (error) {
+      throw error
     }
   }
 }

@@ -1,4 +1,5 @@
 const router = require('express').Router(); 
+const multerOptions = require('../middlewares/multer-config');
 
 const { 
     assignSubscriberToGroup,
@@ -6,11 +7,15 @@ const {
     getSubscriberById,
     editSubscriberById,
     deleteSubscriber,
-    validateSubscriber
+    validateSubscriber,
+    idRequest,
+    identification
  } = require('../controllers/subscribers.controller')
 
  router.put('/:subscriberId/assign-group/:groupId', assignSubscriberToGroup);
  router.put("/:id/validate", validateSubscriber);
+ router.post("/:id/identification",multerOptions.array('files', 5) , identification);
+ router.post("/:id/id-request", idRequest);
  router.put('/:id', editSubscriberById);
  router.delete('/:id', deleteSubscriber);
  router.get('/:id', getSubscriberById);

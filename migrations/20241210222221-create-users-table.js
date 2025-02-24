@@ -1,5 +1,8 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
+
+const SubscriberStatusEnum = require('../enums/subscriber-status.enum');
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Users', {
@@ -43,6 +46,10 @@ module.exports = {
       salt: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      status: {
+        type: Sequelize.ENUM(...Object.values(SubscriberStatusEnum)),
+        defaultValue: SubscriberStatusEnum.ENATTENTE
       },
       createdAt: {
         allowNull: false,

@@ -121,6 +121,10 @@ module.exports = (sequelize, DataTypes) => {
           }
         } 
       },
+      is_contribution_up_to_date: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+      },
       areStatusInternalRegulationsAndMembershipAgreementAccepted: {
         type: DataTypes.BOOLEAN,
         allowNull: false,

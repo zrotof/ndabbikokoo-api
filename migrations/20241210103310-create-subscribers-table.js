@@ -73,6 +73,10 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue : false
       },
+      is_contribution_up_to_date: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

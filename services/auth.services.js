@@ -16,7 +16,6 @@ const {
 } = require("../utils/errors");
 
 
-
 const { generateToken, verifyToken } = require("../utils/jwt.utils");
 const { isPasswordValid } = require("../helpers/password.helpers");
 
@@ -91,7 +90,6 @@ class AuthService {
       throw e;
     }
   } 
-
 }
 
 module.exports = new AuthService();

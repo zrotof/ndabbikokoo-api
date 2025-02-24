@@ -403,3 +403,133 @@ exports.groupValidationMailTemplate = async (groupCreatorName, groupName) => {
 exports.succeedPasswordInitialisationTemplate = async() => {
 
 }
+
+exports.idRequestTemplate = async(subscriberName, token) => {
+  return `
+  <html>
+    <head>
+      <style>
+        *{
+          margin: 0;
+          padding: 0;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+          box-sizing: border-box;
+          -moz-box-sizing: border-box;
+        }
+        body {
+          background-color: #f2f2f2;
+        }
+        .container {
+          width: 100%;
+          margin: 0 auto;
+          padding: 20px 20px;          
+        }
+        .token{
+          display: block;
+          text-decoration: none;
+          font-size: 16px;
+          color: #fff !important;
+          font-weight: bold;
+          background-color : #7fbbd7;
+          padding: 10px 25px;
+          margin-bottom: 20px;
+          margin-top: 20px;
+          width: fit-content
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <p>Bonjour ${subscriberName},</p>
+        <p>
+          Nous souhaitons vérifier votre identité et valider définitivement votre compte. Pour cela, nous vous prions de bien vouloir nous faire parvenir votre pièce d'identité . 
+        </p>
+        <p>
+          Pour nous envoyer votre document d'identification, veillez cliquer sur le boutton ci-après.
+        </p>
+        <br>
+
+        <a class="token" href="${clientBaseUrl}/envoyer-piece-identite?token=${token}" target=blank> J'envois ma pièce d'identité</a>
+
+        <p>
+          Si vous avez des questions ou rencontrez des difficultés, contactez-nous à ${o2switch.contact}.
+        </p>
+        <p>
+          À très bientôt,
+        </p>
+        <br>
+        <p>
+          L’équipe Mahol
+        </p>
+      </div>
+    </body>
+  </html>
+  `
+}
+
+exports.identicationWithAttachmentsMailTemplate = async(subscriberName, email, resgistrationNumber, identificationType) => {
+  return `
+  <html>
+    <head>
+      <style>
+        *{
+          margin: 0;
+          padding: 0;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+          box-sizing: border-box;
+          -moz-box-sizing: border-box;
+        }
+        body {
+          background-color: #f2f2f2;
+        }
+        .container {
+          width: 100%;
+          margin: 0 auto;
+          padding: 20px 20px;          
+        }
+        .token{
+          display: block;
+          text-decoration: none;
+          font-size: 16px;
+          color: #fff !important;
+          font-weight: bold;
+          background-color : #7fbbd7;
+          padding: 10px 25px;
+          margin-bottom: 20px;
+          margin-top: 20px;
+          width: fit-content
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <p>Bonjour,</p>
+        <p>
+            L'adhérent nommé ${subscriberName} vient de soumettre ses éléments d'identification :            
+        </p>
+        <br>
+        <ul>
+          <li> 
+            N° d'adhérent : ${resgistrationNumber}
+          </li>
+          <li> 
+            Email adhérent : ${email}
+          </li>
+          <li> 
+            Type de pièce : ${identificationType}
+          </li>
+        </ul>
+
+        <br>
+        <p>
+          Veuillez procéder à la véification des éléments
+        </p>
+        <br>
+        <p>
+          L’équipe Mahol
+        </p>
+      </div>
+    </body>
+  </html>
+  `
+}

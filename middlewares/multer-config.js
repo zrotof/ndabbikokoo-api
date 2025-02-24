@@ -5,7 +5,8 @@ const FILE_TYPE_MAP = {
   'image/png':'png',
   'image/jpg':'jpg',
   'image/jpeg':'jpeg',
-  'image/webp':'webp'
+  'image/webp':'webp',
+  'application/pdf': 'pdf'
 }
 
 const filefilter = (req, file, cb) => {

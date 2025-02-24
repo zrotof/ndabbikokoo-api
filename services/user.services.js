@@ -69,6 +69,7 @@ exports.getUserBySubscriberId = async (subscriberId) => {
       include: [
         {
           model: models.Subscriber,
+          as: 'subscriber',
           attributes : ["firstname", "lastname"]
         }
       ]
@@ -78,7 +79,16 @@ exports.getUserBySubscriberId = async (subscriberId) => {
       throw new NotFoundError("Il semble y avoir une erreur, cet adhérent est inconnu. Veuillez re-essayer et si le problème persiste veuiller contacter le webmaster")
     }
 
-    return user;
+    const userData = {
+      id: user.id,
+      email: user.email,
+      isEmailConfirmed: user.isEmailConfirmed,
+      isAccountValidated: user.isAccountValidated,
+      firstname: user.subscriber?.firstname,
+      lastname: user.subscriber?.lastname,
+    };
+
+    return userData;
   } catch (error) {
     throw error;
   }
@@ -668,11 +678,20 @@ exports.checkIfAccountIsAlreadyValidated = async (isAccountValidated) => {
   }
 }
 
-exports.checkIfEmailIsConfirmed = async (isEmailConfirmed) => {
+exports.checkIfEmailIsConfirmed = async (isEmailConfirmed, textParam) => {
   try {
     if (!isEmailConfirmed) {
+      let reason ;
+
+      if (textParam === 'validate'){
+        reason = "Attention, vous ne pouvez activer le compte de quelqu'un qui n'a pas encore vérifié son adresse mail !"
+      }
+      else{
+        reason = "Attention, vous ne pouvez demander une pièce d'identité à quelqu'un qui n'a pas encore vérifié son adresse mail !"
+      }
+
       throw new CustomError(
-        "Attention, vous ne pouvez activer le compte de quelqu'un qui n'a pas encore vérifié son adresse mail !"
+        reason
       );
     }
   } catch (error) {

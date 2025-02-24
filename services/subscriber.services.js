@@ -30,7 +30,7 @@ class Subscriber {
           {
             model: models.User,
             as: "user",
-            attributes: ["email", "isEmailConfirmed", "canAuthenticate"],
+            attributes: ["email", "status", "isEmailConfirmed", "canAuthenticate"],
             where: whereCondition,
             required: true,
           },
@@ -57,9 +57,11 @@ class Subscriber {
         town: item.town,
         phoneNumber: item.phoneNumber,
         phoneCode: item.phoneCode,
+        is_contribution_up_to_date: item.is_contribution_up_to_date,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
         email: item.user?.email,
+        status: item.user?.status,
         isEmailConfirmed: item.user?.isEmailConfirmed,
         isUserCanAuthenticate: item.user?.canAuthenticate,
       }));

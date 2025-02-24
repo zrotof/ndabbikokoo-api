@@ -42,6 +42,7 @@ exports.verifyToken = async (token) => {
     const payload = await jwt.verify(token, PUB_KEY);
     return payload;
   } catch (error) {
+    
     if (error instanceof jwt.TokenExpiredError) {
       throw new AuthenticationError("Token has expired", 401);
     }

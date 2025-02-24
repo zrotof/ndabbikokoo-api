@@ -1,21 +1,29 @@
+const ms = require('ms');
+
 const subscriberService = require("../services/subscriber.services");
 const userService = require("../services/user.services");
 const roleService = require("../services/role.services");
 const groupService = require("../services/group.services");
 const guestService = require("../services/guest.services");
 const subscriberServices = require("../services/subscriber.services");
-
+const idService = require("../services/id-request.services");
 const { sequelize } = require("../models");
 const { generateToken } = require("../utils/jwt.utils");
+const { tokenLifeTimeOnIdRequest } = require('../config/dot-env');
+
 const {
   sendEmailVerificationMailRequest,
   sendGroupAssignmentMailResponse,
   sendGuestInvitationMailRequest,
   sendAccountValidationMailResponse,
   sendGroupValidationMailResponse,
+  sendEmailIdRequest,
+  sendEmailIdenticationWithAttachments
 } = require("../services/mail.services");
 
 const { models } = require("../models");
+const idRequestServices = require('../services/id-request.services');
+const mailServices = require('../services/mail.services');
 
 
 exports.getSubscribers = async (req, res, next) => {
@@ -118,7 +126,7 @@ exports.validateSubscriber = async (req, res, next) => {
     const subscriberFullName = subscriber.firstname + " " + subscriber.lastname;
 
     await userService.checkIfAccountIsAlreadyValidated(subscriber.isAccountValidated);
-    await userService.checkIfEmailIsConfirmed(subscriber.isEmailConfirmed);
+    await userService.checkIfEmailIsConfirmed(subscriber.isEmailConfirmed, 'validate');
 
     const group = await groupService.validateGroupIfExistBySubscriberId(subscriberId, transaction);
 
@@ -157,3 +165,64 @@ exports.validateSubscriber = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.idRequest = async (req, res, next) => {
+  try {
+    const subscriberId = req.params.id;
+
+    const user = await userService.getUserBySubscriberId(subscriberId);
+
+    await userService.checkIfEmailIsConfirmed(user.isEmailConfirmed, 'id request');
+
+    const token = await generateToken(user.id, tokenLifeTimeOnIdRequest);
+
+    const expiresInMs = ms(tokenLifeTimeOnIdRequest); 
+    const expiresAt = new Date();
+    expiresAt.setMilliseconds(expiresAt.getMilliseconds() + expiresInMs);
+
+    const idRequestData = {
+      userId: user.id,
+      token,
+      expires_at: expiresAt
+    }
+
+    await idService.createIdRequest(idRequestData);
+    
+    const subscriberFullName = user.firstname + " " + user.lastname;
+
+    await sendEmailIdRequest(subscriberFullName, token, user.email);
+
+    return res.status(201).json({
+      status: "success",
+      data: null,
+      message: `Un mail de demande de pièce d'identité a bien été envoyé à ${subscriberFullName}.`,
+    });
+  } catch (error) {
+    next(error)
+  }
+}
+
+exports.identification = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const {token, identificationType} = req.body;
+    const files = req.files;
+
+    const idRequest = await idRequestServices.getIdRequestByUserId(userId);
+    idRequest.files = files;
+    idRequest.identificationType = identificationType;
+
+    await mailServices.sendEmailIdenticationWithAttachments(idRequest);
+
+    await idRequestServices.deleteIdRequest(idRequest.id);
+
+    return res.status(201).json({
+      status: "success",
+      data: null,
+      message: "",
+    });
+
+  } catch (e) {
+    next(e)
+  }
+}
