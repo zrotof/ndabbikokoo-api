@@ -181,3 +181,20 @@ exports.isTokenValid = async (req, res, next) => {
   }
 }
 
+exports.logout = async (req, res, next) => {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+  });
+
+  res.status(200).json({
+      status: "success",
+      message: "Déconnexion réussie"
+  });
+
+  } catch (e) {
+    next(e)
+  }
+}
+

@@ -24,6 +24,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      filiation: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       firstname: {
         type: Sequelize.STRING,
         allowNull: false

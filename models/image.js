@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Image.belongsTo(models.Article, { foreignKey: "imageableId", constraints: false, as: "article" });
       Image.belongsTo(models.User, { foreignKey: "imageableId", constraints: false });
+      Image.belongsTo(models.Subscriber, { foreignKey: "imageableId", constraints: false, as: "image" });
     }
   }
 
@@ -28,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
       imageableType: {
         type: DataTypes.ENUM(...Object.values(ImageableTypesEnum)),
         allowNull: false,
-      },
+      }
     },
     {
       sequelize,
@@ -37,4 +38,4 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   return Image;
-};
+}

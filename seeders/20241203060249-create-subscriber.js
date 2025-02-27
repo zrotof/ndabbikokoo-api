@@ -109,7 +109,7 @@ module.exports = {
         },
         {
           subscriberId: subscriberId3,
-          email: "manduel21@gmail.com",
+          email: "test@maholdiaspora.com",
           password: passHash3.hash,
           canAuthenticate: true,
           isAccountValidated: true,

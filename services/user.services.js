@@ -26,7 +26,7 @@ const {
 const {
   sendVerificationEmail,
   sendPasswordInitilisationMailRequest,
-  sendSuccessPasswordResetMailResponse
+  sendSuccessPasswordResetMailResponse,
 } = require("../services/mail.services");
 
 const { getRemainingTime } = require("../utils/hour-convertion.utils");
@@ -44,7 +44,7 @@ exports.getUsersWithRoles = async () => {
           model: models.Role,
           attributes: ["name"],
           through: { attributes: [] }, // Exclude join table attributes
-        }
+        },
       ],
     });
 
@@ -62,21 +62,23 @@ exports.getUsersWithRoles = async () => {
 exports.getUserBySubscriberId = async (subscriberId) => {
   try {
     const user = await models.User.findOne({
-      where:{
-        subscriberId: subscriberId
+      where: {
+        subscriberId: subscriberId,
       },
       attributes: ["id", "email", "isEmailConfirmed", "isAccountValidated"],
       include: [
         {
           model: models.Subscriber,
-          as: 'subscriber',
-          attributes : ["firstname", "lastname"]
-        }
-      ]
-    })
+          as: "subscriber",
+          attributes: ["firstname", "lastname"],
+        },
+      ],
+    });
 
-    if(!user){
-      throw new NotFoundError("Il semble y avoir une erreur, cet adhérent est inconnu. Veuillez re-essayer et si le problème persiste veuiller contacter le webmaster")
+    if (!user) {
+      throw new NotFoundError(
+        "Il semble y avoir une erreur, cet adhérent est inconnu. Veuillez re-essayer et si le problème persiste veuiller contacter le webmaster"
+      );
     }
 
     const userData = {
@@ -92,37 +94,50 @@ exports.getUserBySubscriberId = async (subscriberId) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 exports.getUserWithRolesById = async (userId) => {
   try {
-
     const user = await models.User.findByPk(userId, {
       attributes: ["email", "createdAt"],
       include: [
         {
           model: models.Subscriber,
-          as: 'subscriber',
+          as: "subscriber",
           attributes: [
-            "id","firstname", "lastname", "sex", "address", "postalCode", "country", "town", "phoneNumber", "phoneCode"
+            "id",
+            "firstname",
+            "lastname",
+            "sex",
+            "address",
+            "postalCode",
+            "country",
+            "town",
+            "phoneNumber",
+            "phoneCode",
           ],
           include: [
             {
               model: models.Role,
-              as: 'roles',
+              as: "roles",
               through: {
-                attributes: [] // Exclure les colonnes de la table pivot
+                attributes: [], // Exclure les colonnes de la table pivot
               },
-              attributes: ['id', 'name'], // Inclure uniqu
+              attributes: ["id", "name"], // Inclure uniqu
             },
             {
               model: models.Group,
-              as: 'group',
-              attributes: ['id', 'name'],
+              as: "group",
+              attributes: ["id", "name"],
             },
+            {
+              model: models.Image,
+              as: "image",
+              attributes: ["url"],
+            }
           ],
         },
-      ]
+      ],
     });
 
     if (!user) {
@@ -132,17 +147,17 @@ exports.getUserWithRolesById = async (userId) => {
     }
 
     const { subscriber, ...rest } = user.toJSON();
-    const { roles, group, ...subscriberDetails } = subscriber;
-  
+    const { roles, group, image, ...subscriberDetails } = subscriber;
 
     const dataToRetrieve = {
       subscriber: {
         ...rest,
-        ...subscriberDetails
+        ...subscriberDetails,
+        image: image ? image.url : null,
       },
       roles: roles ? [...roles] : [],
-      group: group ? {...group} : null
-    }
+      group: group ? { ...group } : null,
+    };
 
     return dataToRetrieve;
   } catch (error) {
@@ -151,9 +166,10 @@ exports.getUserWithRolesById = async (userId) => {
 };
 
 exports.createUser = async (userDataToSave, transaction) => {
-
   try {
-    const hashedPassword = generateHashedPasswordAndSalt(userDataToSave.password);
+    const hashedPassword = generateHashedPasswordAndSalt(
+      userDataToSave.password
+    );
 
     userDataToSave = {
       ...userDataToSave,
@@ -181,17 +197,17 @@ exports.updateUser = async (userId, userData, roleNames) => {
 
     await userToEdit.update(userData, { transaction });
 
-    if(roleNames){
+    if (roleNames) {
       const roles = await models.Role.findAll({
         where: {
           name: roleNames,
         },
         transaction,
       });
-  
+
       await userToEdit.setRoles(roles, { transaction });
     }
-    
+
     await transaction.commit();
 
     return userToEdit;
@@ -210,8 +226,10 @@ exports.deleteUser = async (userId) => {
       transaction,
     });
 
-    if(user.email === supraAdminEmail){
-      throw new AuthorizationError("Vous n'êtes pas autorisé à supprimer cet utilisateur")
+    if (user.email === supraAdminEmail) {
+      throw new AuthorizationError(
+        "Vous n'êtes pas autorisé à supprimer cet utilisateur"
+      );
     }
 
     if (!user) {
@@ -259,8 +277,11 @@ exports.loginUser = async (email, password, ipAddress) => {
       },
     });
 
-    if(resetUserPassword){
-      throw new CustomError("Vous ne pouvez vous connecter car une demande de changement de mot de passe est déjà en cours. Veuillez vérifier votre email pour le lien de réinitialisation de ce dernier.",403)
+    if (resetUserPassword) {
+      throw new CustomError(
+        "Vous ne pouvez vous connecter car une demande de changement de mot de passe est déjà en cours. Veuillez vérifier votre email pour le lien de réinitialisation de ce dernier.",
+        403
+      );
     }
 
     // Recherche des tentatives de connexion par adresse IP et utilisateur
@@ -350,7 +371,6 @@ exports.loginUser = async (email, password, ipAddress) => {
 
     await user.save();
 
-
     // Si la connexion réussit et qu'il y avait des tentatives échouées
     if (attempts) {
       await attempts.destroy(); // Supprimer les tentatives après connexion réussie
@@ -388,10 +408,9 @@ exports.validateUserEmailAccount = async (authHeader) => {
     // The verifying public key
     const PUB_KEY = fs.readFileSync(pathToKey, "utf8");
 
-    let response
+    let response;
     await jwt.verify(token, PUB_KEY, async (err, decoded) => {
       if (err) {
-
         if (err.name === "TokenExpiredError") {
           const decoded = jwt.decode(token);
           const userId = decoded.sub;
@@ -401,9 +420,9 @@ exports.validateUserEmailAccount = async (authHeader) => {
               include: [
                 {
                   model: models.Subscriber,
-                  attributes: ['firstname']
-                }
-              ]
+                  attributes: ["firstname"],
+                },
+              ],
             });
 
             if (user.isEmailConfirmed) {
@@ -435,12 +454,12 @@ exports.validateUserEmailAccount = async (authHeader) => {
         include: [
           {
             model: models.Subscriber,
-            as: 'subscriber',
-            attributes: ['firstname']
-          }
-        ]
+            as: "subscriber",
+            attributes: ["firstname"],
+          },
+        ],
       });
-      
+
       if (user.isEmailConfirmed === true) {
         throw new CustomError(
           `Nous sommes content de vous revoir ${user.Subscriber?.firstname}, votre compte a déjà été validé ! Vous pouvez vous connecter`,
@@ -452,11 +471,9 @@ exports.validateUserEmailAccount = async (authHeader) => {
       user.save({ id: userId });
 
       response = { name: user.Subscriber?.firstname, email: user.email };
-    }
-  
-  );
+    });
 
-  return response;
+    return response;
   } catch (error) {
     throw error;
   }
@@ -494,9 +511,9 @@ exports.askVerificationEmail = async (authHeader) => {
             include: [
               {
                 model: models.Subscriber,
-                attributes: ['firstname']
-              }
-            ]
+                attributes: ["firstname"],
+              },
+            ],
           });
 
           if (!user) {
@@ -526,18 +543,16 @@ exports.askVerificationEmail = async (authHeader) => {
 
 exports.initPasswordReset = async (email) => {
   try {
-    const user = await models.User.findOne(
-      {
-        where:{ email },
-        include: [
-          {
-            model: models.Subscriber,
-            as: 'subscriber',
-            attributes: ["firstname", "lastname"],
-          }
-        ],
-      }
-    );
+    const user = await models.User.findOne({
+      where: { email },
+      include: [
+        {
+          model: models.Subscriber,
+          as: "subscriber",
+          attributes: ["firstname", "lastname"],
+        },
+      ],
+    });
 
     if (!user) {
       throw new NotFoundError(
@@ -592,7 +607,6 @@ exports.initPasswordReset = async (email) => {
 };
 
 exports.resetPassword = async (resetPasswordToken, password) => {
-
   try {
     if (!resetPasswordToken) {
       throw new CustomError(
@@ -609,7 +623,6 @@ exports.resetPassword = async (resetPasswordToken, password) => {
     await jwt.verify(resetPasswordToken, PUB_KEY, async (err, decoded) => {
       if (err) {
         if (err.name === "TokenExpiredError") {
-          
           throw new CustomError(
             "Le lien de re-initialisation n'est plus fonctionnel. Veuillez en demander un autre en cliquant sur le boutton ci-dessous et un nouveau mail vous sera envoyé à l'adresse mail associé à votre compte. Une fois que vous aurez reçu ce nouveau mail, vous aurez environ 1h heure pour changer votre mot de passe.",
             401
@@ -627,21 +640,23 @@ exports.resetPassword = async (resetPasswordToken, password) => {
         include: [
           {
             model: models.Subscriber,
-            as: 'subscriber',
+            as: "subscriber",
             attributes: ["firstname", "lastname"],
           },
-        ]
+        ],
       });
 
       if (!user) {
         throw new NotFoundError(
-          "Il semble y avoir une erreur! Assurez-vous de bien cliquer sur le bouton de re-initialisation contenu dans le mail que vous avez reçu et veillez à ne pas modifier l'url de la page sur laquelle vous attérisez !",
+          "Il semble y avoir une erreur! Assurez-vous de bien cliquer sur le bouton de re-initialisation contenu dans le mail que vous avez reçu et veillez à ne pas modifier l'url de la page sur laquelle vous attérisez !"
         );
       }
 
-      const resetPassword = await models.UserPasswordResetRequest.findOne({where:{userId}});
+      const resetPassword = await models.UserPasswordResetRequest.findOne({
+        where: { userId },
+      });
 
-      if(!resetPassword){
+      if (!resetPassword) {
         throw new CustomError(
           "Il semble y avoir une erreur! Assurez-vous de bien cliquer sur le bouton de re-initialisation contenu dans le mail que vous avez reçu et veillez à ne pas modifier l'url de la page sur laquelle vous attérisez !",
           401
@@ -653,18 +668,18 @@ exports.resetPassword = async (resetPasswordToken, password) => {
       const saltHash = generateHashedPasswordAndSalt(password);
 
       user.password = saltHash.hash;
-      user.salt = saltHash.salt
+      user.salt = saltHash.salt;
 
       await user.save();
 
-      const fullName = user.subscriber.getFullName(); 
-      
-      await sendSuccessPasswordResetMailResponse(fullName, user.email)
+      const fullName = user.subscriber.getFullName();
+
+      await sendSuccessPasswordResetMailResponse(fullName, user.email);
     });
   } catch (error) {
-    throw error
+    throw error;
   }
-}
+};
 
 exports.checkIfAccountIsAlreadyValidated = async (isAccountValidated) => {
   try {
@@ -676,39 +691,36 @@ exports.checkIfAccountIsAlreadyValidated = async (isAccountValidated) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
 exports.checkIfEmailIsConfirmed = async (isEmailConfirmed, textParam) => {
   try {
     if (!isEmailConfirmed) {
-      let reason ;
+      let reason;
 
-      if (textParam === 'validate'){
-        reason = "Attention, vous ne pouvez activer le compte de quelqu'un qui n'a pas encore vérifié son adresse mail !"
-      }
-      else{
-        reason = "Attention, vous ne pouvez demander une pièce d'identité à quelqu'un qui n'a pas encore vérifié son adresse mail !"
+      if (textParam === "validate") {
+        reason =
+          "Attention, vous ne pouvez activer le compte de quelqu'un qui n'a pas encore vérifié son adresse mail !";
+      } else {
+        reason =
+          "Attention, vous ne pouvez demander une pièce d'identité à quelqu'un qui n'a pas encore vérifié son adresse mail !";
       }
 
-      throw new CustomError(
-        reason
-      );
+      throw new CustomError(reason);
     }
   } catch (error) {
     throw error;
   }
-}
+};
 
 exports.validateUser = async (subscriberId, transaction) => {
   try {
-
     await models.User.update(
       { isAccountValidated: true, canAuthenticate: true },
       { where: { subscriberId: subscriberId } },
       transaction
     );
-
   } catch (error) {
     throw error;
   }
-}
+};

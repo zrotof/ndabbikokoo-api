@@ -1,13 +1,6 @@
 const ms = require('ms');
-
-const subscriberService = require("../services/subscriber.services");
-const userService = require("../services/user.services");
-const roleService = require("../services/role.services");
-const groupService = require("../services/group.services");
-const guestService = require("../services/guest.services");
-const subscriberServices = require("../services/subscriber.services");
-const idService = require("../services/id-request.services");
-const { sequelize } = require("../models");
+const { o2switch } = require('../config/dot-env')
+const { models, sequelize } = require("../models");
 const { generateToken } = require("../utils/jwt.utils");
 const { tokenLifeTimeOnIdRequest } = require('../config/dot-env');
 
@@ -21,10 +14,18 @@ const {
   sendEmailIdenticationWithAttachments
 } = require("../services/mail.services");
 
-const { models } = require("../models");
+
 const idRequestServices = require('../services/id-request.services');
 const mailServices = require('../services/mail.services');
+const subscriberService = require("../services/subscriber.services");
+const userService = require("../services/user.services");
+const groupService = require("../services/group.services");
+const idService = require("../services/id-request.services");
+const beneficiaryService = require('../services/beneficiary.services');
+const familyService = require('../services/family.services');
+const imageService = require('../services/image.services');
 
+const imageableTypeEnum = require('../enums/imageable-types.enum');
 
 exports.getSubscribers = async (req, res, next) => {
   try {
@@ -211,6 +212,7 @@ exports.identification = async (req, res, next) => {
     const idRequest = await idRequestServices.getIdRequestByUserId(userId);
     idRequest.files = files;
     idRequest.identificationType = identificationType;
+    idRequest.email = o2switch.idReceiver;
 
     await mailServices.sendEmailIdenticationWithAttachments(idRequest);
 
@@ -224,5 +226,174 @@ exports.identification = async (req, res, next) => {
 
   } catch (e) {
     next(e)
+  }
+}
+
+exports.editBeneficiary = async (req, res, next) => {
+  try {
+    const { subscriberId, beneficiaryId } = req.params;
+    const newData = req.body;
+
+    await beneficiaryService.getBeneficiary(subscriberId, beneficiaryId);
+
+    await beneficiaryService.editBeneficiaryById(beneficiaryId, newData);
+    
+    return res.status(201).json({
+      status: "success",
+      data: null,
+      message: "Bénéficiaire modifié avec succès",
+    });
+
+  } catch (e) {
+    next(e)
+  }
+}
+
+exports.getSubscriberFamily = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const families = await familyService.getFamilyMembersBySubscriberId(id);
+
+    return res.status(200).json({
+      status: "success",
+      data: families,
+      message: "",
+    });
+
+  } catch (e) {
+    next(e)
+  }
+}
+
+exports.registerSubscriberFamilyMember = async (req, res, next) => {
+  try {
+
+      const { id } = req.params;
+
+      const subscriberFamilyMemberToSave = { 
+        firstname: req.body?.firstname,
+        filiation: req.body?.filiation,
+        lastname: req.body?.lastname,
+        sex: req.body?.sex
+      }
+
+      await subscriberService.getSubscriberById(id);
+  
+      subscriberFamilyMemberToSave.subscriberId = id;
+
+      const family = await familyService.registerFamily(subscriberFamilyMemberToSave);
+  
+      return res.status(201).json({
+        status: "success",
+        data: family,
+        message: 'Membre de famille créé avec succès !'
+      });
+  
+    } catch (error) {
+      next(error);
+    }
+}
+
+exports.editSubscriberFamilyMember= async (req, res, next) => {
+  try {
+    const { id, familyMemberId } = req.params;
+    const newData = req.body;
+
+    await subscriberService.getSubscriberById(id);
+
+    await familyService.editFamilyMemberById(familyMemberId, newData);
+    
+    return res.status(201).json({
+      status: "success",
+      data: null,
+      message: "Membre de famille modifié avec succès",
+    });
+
+  } catch (e) {
+    next(e)
+  }
+}
+
+exports.deleteSubscriberFamilyMember = async (req, res, next) => {
+  try {
+    const { id, familyMemberId } = req.params;
+
+    await subscriberService.getSubscriberById(id);
+
+    await familyService.deleteFamilyMember(id, familyMemberId);
+
+    return res.status(200).json({
+      status: "success",
+      data: null,
+      message: "Membre de famille supprimé avec succès !",
+    });
+
+  } catch (e) {
+    next(e)
+  }
+}
+
+exports.editSubscriberProfile = async (req, res, next) => {
+  try {
+    const transaction = await sequelize.transaction();
+
+    const { id } = req.params;
+
+    const file = req.file;
+
+    const { 
+      email,
+      country,
+      town,
+      phoneCode,
+      phoneNumber,
+      address,
+      postalCode
+    } = req.body;
+
+    const subscriberData = await subscriberService.getSubscriberById(id);
+
+    const subscriber = {};
+
+    if (email) {
+      await userService.updateUser(id,{email});
+    } 
+
+    if (phoneCode) subscriber.phoneCode = phoneCode;
+    if (address) subscriber.address = address;
+    if (postalCode) subscriber.postalCode = postalCode;
+    if (country) subscriber.country = country;
+    if (town) subscriber.town = town;
+    if (phoneNumber) subscriber.phoneNumber = phoneNumber;
+
+    await subscriberService.updateSubscriberById(id, subscriber);
+
+    if(file){
+      const image = await imageService.getImageableIdAndimageableType(id, imageableTypeEnum.SUBSCRIBER);
+      
+      if(image){
+        await imageService.deleteImage(image.id, image.publicId);
+      }
+      
+      const folder= `subscribers/${subscriberData.registrationNumber}`;
+      
+      await imageService.uploadImage(
+        file,
+        id,
+        imageableTypeEnum.SUBSCRIBER,
+        folder,
+        transaction
+      );
+    }
+
+    return res.status(201).json({
+      status: "success",
+      data: null,
+      message: "Profil modifié avec succès",
+    });
+    
+  } catch (e) {
+    next(e);
   }
 }

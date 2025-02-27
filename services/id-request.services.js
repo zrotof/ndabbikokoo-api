@@ -19,9 +19,9 @@ class IdRequestService {
                 attributes: [
                   "firstname",
                   "lastname",
-                  "subscriberRegistrationNumber",
-                ],
-              },
+                  "subscriberRegistrationNumber"
+                ]
+              }
             ],
           },
         ],

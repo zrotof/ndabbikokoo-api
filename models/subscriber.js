@@ -1,6 +1,8 @@
 "use strict";
 const { Model } = require("sequelize");
 
+const imageableTypeEnum = require('../enums/imageable-types.enum');
+
 module.exports = (sequelize, DataTypes) => {
   class Subscriber extends Model {
     
@@ -14,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
       Subscriber.belongsToMany(models.Role, { through: 'SubscriberRoles', foreignKey: 'subscriberId', as : 'roles' });
       Subscriber.hasOne(models.Group, { foreignKey: 'representativeId', as: 'representative' });
       Subscriber.hasMany(models.Family, { foreignKey: 'subscriberId', as: 'families' });
+      Subscriber.hasOne(models.Image, { foreignKey: 'imageableId', constraints: false, scope: {
+        imageableType: imageableTypeEnum.SUBSCRIBER
+      }, as: 'image' });
     }
   }
 

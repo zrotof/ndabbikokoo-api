@@ -1,6 +1,6 @@
-
 module.exports = Object.freeze({
     ARTICLE: "Article",
-    USER: "User"
+    USER: "User",
+    SUBSCRIBER: "Subscriber"
 });
   

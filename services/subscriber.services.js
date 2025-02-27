@@ -7,6 +7,7 @@ const guestServices = require("./guest.services");
 const { generateRegistrationNumber } = require("../utils/generate-registration-number");
 
 class Subscriber {
+  
   async getSubscribers(queries) {
     try {
       let whereCondition = {};
@@ -85,7 +86,7 @@ class Subscriber {
             model: models.Group,
             as: "group",
             attributes: ["id", "name", "representativeId"],
-          },
+          }
         ],
       });
 
@@ -98,8 +99,11 @@ class Subscriber {
         subscriber.groupId
       );
 
+      console.log(subscriber.images);
+
       const sub = {
         id: subscriber.id,
+        registrationNumber: subscriber.subscriberRegistrationNumber,
         firstname: subscriber.firstname,
         lastname: subscriber.lastname,
         sex: subscriber.sex,

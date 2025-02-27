@@ -60,12 +60,13 @@ exports.createArticle = async (req, res, next) => {
       transaction
     );
 
-    console.log(article.id)
+    const folder= 'articles';
 
     await imageService.uploadImage(
       file,
       article.id,
       imageableTypeEnum.ARTICLE,
+      folder,
       transaction
     );
 
@@ -92,10 +93,14 @@ exports.updateArticle = async (req, res, next) => {
     if (file) {
       const image = await imageService.getImageByUrl(article.coverImage);
       await imageService.deleteImage(image.id, image.publicId);
+      
+      const folder= 'articles';
+
       await imageService.uploadImage(
         file,
         article.id,
         imageableTypeEnum.ARTICLE,
+        folder,
         transaction
       );
     }

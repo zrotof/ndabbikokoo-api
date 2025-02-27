@@ -5,14 +5,14 @@ const { models } = require("../models");
 
 class ImageService {
 
-  async uploadImage(file, imageableId, imageableType, transaction) {
+  async uploadImage(file, imageableId, imageableType, folder, transaction) {
     try {
       if (!file) throw new Error("No file uploaded");
 
       const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
       
       const uploadedImage = await cloudinary.uploader.upload(dataUrl, {
-        folder: "articles"
+        folder: folder
       });
 
       const imageData = {
@@ -40,9 +40,27 @@ class ImageService {
         }
       )
 
-      console.log(image)
-
       return image.get({ plain: true });
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async getImageableIdAndimageableType(imageableId, imageableType){
+    try {
+      const image = await models.Image.findOne(
+        {
+          where : {
+            imageableId,
+            imageableType
+          }
+        }
+      )
+
+      if(image){
+        return image.get({ plain: true });
+      }
+
     } catch (e) {
       throw e
     }
