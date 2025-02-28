@@ -32,7 +32,11 @@ module.exports = (sequelize, DataTypes) => {
       expires_at: { 
         type: DataTypes.DATE, 
         allowNull: false 
-      }  
+      },
+      isAlreadyUsed: {
+        type: DataTypes.BOOLEAN, 
+        defaultValue: false
+      }
     },
     {
       sequelize,

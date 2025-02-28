@@ -99,8 +99,6 @@ class Subscriber {
         subscriber.groupId
       );
 
-      console.log(subscriber.images);
-
       const sub = {
         id: subscriber.id,
         registrationNumber: subscriber.subscriberRegistrationNumber,

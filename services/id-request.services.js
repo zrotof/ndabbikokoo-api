@@ -34,6 +34,7 @@ class IdRequestService {
       const cleanRequest = idRequest.get({ plain: true });
 
       const formattedIdRequest = {
+        id: cleanRequest.id,
         email: cleanRequest.user.email,
         firstname: cleanRequest.user.subscriber.firstname,
         lastname: cleanRequest.user.subscriber.lastname,
@@ -61,22 +62,26 @@ class IdRequestService {
     }
   }
 
-  async createIdRequest(reqData) {
+  async updateIdRequest(id,reqData) {
     try {
-      const idRequest = await models.IdRequest.create(reqData);
+      const idRequest = await models.IdRequest.update(reqData,{
+        where: {id}
+      });
 
       if (!idRequest) {
-        throw new CustomError("Erreur lors de la requêtte d'envois");
-      }
+        throw new NotFoundError(
+          "Le demande pièce d'identité que vous essayez de modifier est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !"
+        );      }
 
-      return idRequest;
-    } catch (e) {
+        return true;
+      } catch (e) {
       throw e;
     }
   }
 
-  async deleteIdRequest(id) {
+  async deleteIdRequest(id, transction) {
     try {
+      console.log(id)
       const idRequest = await models.IdRequest.destroy({
         where: {id}
         }
@@ -90,6 +95,22 @@ class IdRequestService {
 
       return true;
 
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async checkIfIdsAreAlreadySended(userId) {
+    try {
+      const idRequest = await models.IdRequest.findOne({
+        where: { userId }
+      });
+
+      if (!idRequest?.isAlreadyUsed){
+        throw new CustomError("L'adhérent n'a pas encore envoyé de pièce d'identité pour le moment");
+      }
+
+      return idRequest.id;
     } catch (e) {
       throw e;
     }

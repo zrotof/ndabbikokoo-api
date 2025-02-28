@@ -109,13 +109,13 @@ module.exports = {
         },
         {
           subscriberId: subscriberId3,
-          email: "test@maholdiaspora.com",
+          email: "manduel21@gmail.com",
           password: passHash3.hash,
-          canAuthenticate: true,
-          isAccountValidated: true,
+          canAuthenticate: false,
+          isAccountValidated: false,
           isEmailConfirmed: true,
           salt: passHash3.salt,
-          status: SubscriberStatusEnum.ACTIF,
+          status: SubscriberStatusEnum.ENATTENTE,
           createdAt: new Date(),
           updatedAt: new Date(),
         }

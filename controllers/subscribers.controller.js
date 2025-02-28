@@ -15,7 +15,7 @@ const {
 } = require("../services/mail.services");
 
 
-const idRequestServices = require('../services/id-request.services');
+const idRequestService = require('../services/id-request.services');
 const mailServices = require('../services/mail.services');
 const subscriberService = require("../services/subscriber.services");
 const userService = require("../services/user.services");
@@ -26,6 +26,7 @@ const familyService = require('../services/family.services');
 const imageService = require('../services/image.services');
 
 const imageableTypeEnum = require('../enums/imageable-types.enum');
+const userStatusEnum = require('../enums/subscriber-status.enum')
 
 exports.getSubscribers = async (req, res, next) => {
   try {
@@ -124,11 +125,15 @@ exports.validateSubscriber = async (req, res, next) => {
     const subscriberId = req.params.id;
 
     const subscriber = await subscriberService.getSubscriberById(subscriberId);
+    const user = await userService.getUserBySubscriberId(subscriberId);
+
     const subscriberFullName = subscriber.firstname + " " + subscriber.lastname;
 
     await userService.checkIfAccountIsAlreadyValidated(subscriber.isAccountValidated);
     await userService.checkIfEmailIsConfirmed(subscriber.isEmailConfirmed, 'validate');
-
+    
+    const isRequestId = await idRequestService.checkIfIdsAreAlreadySended(user.id);
+    
     const group = await groupService.validateGroupIfExistBySubscriberId(subscriberId, transaction);
 
     if (group.isGroupRepresentative === true) {
@@ -148,6 +153,12 @@ exports.validateSubscriber = async (req, res, next) => {
       await sendGroupValidationMailResponse(mailGroupValidationObject);
     }
 
+    //Change the status of the subscriber to validated
+    await userService.updateUser(user.id, {status: userStatusEnum.ACTIF }, null, transaction);
+
+    //Pour supprimer la demande de pièce d'idetité de la base de donnée
+    await idRequestService.deleteIdRequest(isRequestId, transaction);
+    
     await userService.validateUser(subscriberId, transaction);
 
     const mailValidationObject = {
@@ -209,14 +220,14 @@ exports.identification = async (req, res, next) => {
     const {token, identificationType} = req.body;
     const files = req.files;
 
-    const idRequest = await idRequestServices.getIdRequestByUserId(userId);
+    const idRequest = await idRequestService.getIdRequestByUserId(userId);
     idRequest.files = files;
     idRequest.identificationType = identificationType;
     idRequest.email = o2switch.idReceiver;
 
-    await mailServices.sendEmailIdenticationWithAttachments(idRequest);
+    await idRequestService.updateIdRequest(idRequest.id, {isAlreadyUsed: true});
 
-    await idRequestServices.deleteIdRequest(idRequest.id);
+    await mailServices.sendEmailIdenticationWithAttachments(idRequest);
 
     return res.status(201).json({
       status: "success",

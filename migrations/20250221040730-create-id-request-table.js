@@ -21,13 +21,17 @@ module.exports = {
         onDelete: 'CASCADE'
       },
       token: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false,
         unique: true
       },
       expires_at: {
         type: Sequelize.DATE,
         allowNull: false
+      },
+      isAlreadyUsed: {
+        type: Sequelize.BOOLEAN, 
+        defaultValue: false
       },
       createdAt: {
         type: Sequelize.DATE,
