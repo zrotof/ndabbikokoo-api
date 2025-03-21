@@ -1,5 +1,5 @@
 const { models } = require("../models");
-const { NotFoundError, CustomError } = require('../utils/errors');
+const { NotFoundError, CustomError } = require("../utils/errors");
 
 exports.getRoles = async () => {
   try {
@@ -13,7 +13,7 @@ exports.getRoles = async () => {
 exports.getRoleByCode = async (code) => {
   try {
     const role = await models.Role.findOne({
-      where: {code}
+      where: { code },
     });
 
     if (!role) {
@@ -24,17 +24,61 @@ exports.getRoleByCode = async (code) => {
   } catch (error) {
     throw error;
   }
-}
+};
 
-exports.assignRolesToSubscriber = async (subscriberId, isGroupRepresentative, transaction) => {
+exports.getRoleNamesByIds = async (roleIds) => {
   try {
-    const subscriber = await models.Subscriber.findByPk(subscriberId, {transaction});
+    const roles = await models.Role.findAll({
+      where: { id: roleIds },
+      attributes: ["name"],
+    });
 
-    if (!subscriber) {
-      throw new NotFoundError('Nous nous retouvons pas cet adhérent');
+    return roles.map((role) => role.name);
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.getStaffRoles = async (staffId) => {
+  try {
+    const staff = await models.Staff.findByPk(staffId, {
+      attributes: ["id"],
+      include: [
+        {
+          model: models.Role,
+          as: 'roles',
+          attributes: ['id', 'name', 'code'],
+          through: { attributes: [] }
+        }
+      ]
+    });
+
+    if (!staff) {
+      return { error: "Membre de staff non trouvé, lors de la recherche de rôle !" };
     }
 
-    const roleCode = isGroupRepresentative ? 'representative' : 'member';
+    return staff.roles;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+exports.assignRolesToSubscriber = async (
+  subscriberId,
+  isGroupRepresentative,
+  transaction
+) => {
+  try {
+    const subscriber = await models.Subscriber.findByPk(subscriberId, {
+      transaction,
+    });
+
+    if (!subscriber) {
+      throw new NotFoundError("Nous nous retouvons pas cet adhérent");
+    }
+
+    const roleCode = isGroupRepresentative ? "representative" : "member";
 
     const role = await this.getRoleByCode(roleCode);
 
@@ -45,36 +89,43 @@ exports.assignRolesToSubscriber = async (subscriberId, isGroupRepresentative, tr
   }
 };
 
-exports.assignRolesToStaff = async (subscriberId, Ids = [], transaction) => {
+exports.assignRolesToStaff = async (staffId, Ids = [], transaction) => {
   try {
-    const subscriber = await models.Subscriber.findByPk(subscriberId);
-    
-    if (!subscriber) {
-      throw new NotFoundError('Nous nous retouvons pas cet adhérent');
-    }
-    
-    const rolesToAssign = await models.Role.findAll({
-      where: {
-        id: rolesId
-      },
-      transaction
+
+    const staff = await models.Staff.findByPk(staffId, {
+      attributes: ["id"]
     });
 
-    const foundRoleIds = rolesToAssign.map(role => role.id);
-    const missingRoles = rolesId.filter(roleId => !foundRoleIds.includes(roleId));
+    if (!staff) {
+      throw new NotFoundError("Nous nous retouvons pas ce membre de staff");
+    }
+
+    const rolesToAssign = await models.Role.findAll({
+      where: {
+        id: Ids,
+      }
+    });
+
+    const foundRoleIds = rolesToAssign.map((role) => role.id);
+
+    const missingRoles = Ids.filter(
+      (roleId) => !foundRoleIds.includes(+roleId)
+    );
 
     if (missingRoles.length > 0) {
-      throw new NotFoundError("Attention! Vous essayer de créer un adhérent en lui assignant des roles inexistants");
+      throw new NotFoundError(
+        "Attention! Vous essayer de créer un adhérent en lui assignant des roles inexistants"
+      );
     }
 
     if (rolesToAssign.length === 0) {
-
-      const defaultRole = await this.getDefaultRole();
-
-      rolesToAssign.push(defaultRole);
+      throw new NotFoundError(
+        "Une erreur est survenue! problème de role inexistant"
+      );    
     }
 
-    await subscriber.addRoles(rolesToAssign, { transaction });
+    await staff.addRoles(rolesToAssign, { transaction });
+
     return true;
   } catch (error) {
     throw error;
@@ -97,12 +148,14 @@ exports.updateRole = async (roleId, newRoleData) => {
     });
 
     if (updatedRowCount[0] === 0) {
-      throw new NotFoundError("Le rôle que vous essayez de modifier est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !");
+      throw new NotFoundError(
+        "Le rôle que vous essayez de modifier est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !"
+      );
     }
 
     return true;
   } catch (error) {
-    throw error
+    throw error;
   }
 };
 
@@ -113,7 +166,9 @@ exports.deleteRole = async (roleId) => {
     });
 
     if (deletedRole === 0) {
-      throw new NotFoundError("Le rôle que vous essayez de supprimer est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !");
+      throw new NotFoundError(
+        "Le rôle que vous essayez de supprimer est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !"
+      );
     }
 
     return true;

@@ -1,4 +1,5 @@
 const { models } = require("../models");
+const { Op } = require("sequelize");
 
 const { CustomError, NotFoundError } = require("../utils/errors");
 const { isObjectEmpty } = require("../utils/parsing.utils");
@@ -10,17 +11,31 @@ class Subscriber {
   
   async getSubscribers(queries) {
     try {
-      let whereCondition = {};
 
-      if (queries.isAccountValidated) {
-        whereCondition = {
-          isAccountValidated:
-            queries.isAccountValidated === true ||
-            queries.isAccountValidated === "true",
-        };
-      }
+    let whereCondition = {};
+    let userWhereCondition = {};
+
+    if (queries.searchTerm) {
+      let searchValue = `%${queries.searchTerm}%`;
+
+      whereCondition[Op.or] = [
+        { firstname: { [Op.iLike]: searchValue } },
+        { lastname: { [Op.iLike]: searchValue } },
+        { subscriberRegistrationNumber: { [Op.iLike]: searchValue } },
+        { country: { [Op.iLike]: searchValue } },
+        { town: { [Op.iLike]: searchValue } },
+        { phoneNumber: { [Op.iLike]: searchValue } },
+      ];
+
+      userWhereCondition[Op.or] = [{ email: { [Op.iLike]: searchValue } }];
+    }
+
+    let limit = queries.limit ? parseInt(queries.limit) : 10;
+    let offset = queries.offset ? parseInt(queries.offset) : 0;
+
 
       const subscribersList = await models.Subscriber.findAll({
+        where: whereCondition,
         attributes: {
           exclude: [
             "areStatusInternalRegulationsAndMembershipAgreementAccepted",
@@ -32,15 +47,15 @@ class Subscriber {
             model: models.User,
             as: "user",
             attributes: ["email", "status", "isEmailConfirmed", "canAuthenticate"],
-            where: whereCondition,
-            required: true,
+            ...(Object.keys(userWhereCondition).length > 0 && { where: userWhereCondition }),
+            required: false
           },
           {
             model: models.Group,
             as: "group",
             attributes: ["id", "name"],
           },
-        ],
+        ]
       });
 
       const subscribers = subscribersList.map((item) => ({
@@ -91,7 +106,7 @@ class Subscriber {
       });
 
       if (!subscriber) {
-        return NotFoundError("Cet adhérent est inconnu.");
+        return new NotFoundError("Cet adhérent est inconnu.");
       }
 
       // Compter le nombre total de membres dans le groupe
@@ -228,7 +243,7 @@ class Subscriber {
       });
 
       if (!subscriber) {
-        throw new Error("Subscriber not found");
+        throw new NotFoundError("Subscriber not found");
       }
 
       const group = await models.Group.findByPk(groupId);

@@ -1,5 +1,5 @@
 const { models, sequelize } = require("../models");
-const { environment } = require('../config/dot-env')
+const { clientBaseUrl, clientAdminBaseUrl, environment } = require('../config/dot-env')
 const { generateToken } = require("../utils/jwt.utils");
 
 const roleService = require("../services/role.services");
@@ -10,7 +10,6 @@ const subscriberService = require("../services/subscriber.services");
 const authService = require("../services/auth.services");
 const mailService = require("../services/mail.services");
 const staffService = require("../services/staff.services");
-
 
 exports.registerSubscriber = async (req, res, next) => {
   const transaction = await sequelize.transaction();
@@ -129,7 +128,8 @@ exports.loginSubscriber = async (req, res, next) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: environment === 'production',
-      maxAge: 3600 * 1000
+      maxAge: 3600 * 1000,
+      domain: +clientBaseUrl
     });
 
     res.status(201).json({
@@ -145,19 +145,22 @@ exports.loginSubscriber = async (req, res, next) => {
 exports.loginStaff = async (req, res, next) => {
   try {
 
-    const ipAddress = req.header("x-forwarded-for") || req.socket.remoteAddress;
     const { email, password } = req.body;
 
-    const token = await loginUser(email,password,ipAddress);
+    const token = await authService.loginStaff(email,password);
 
-    return res.status(200).json(
-      {
-        status : "success",
-        data : token,
-        message : "Connexion réussie !"
-      }
-    )
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: environment === 'production',
+      maxAge: 3600 * 1000,
+      domain: +clientAdminBaseUrl
+    });
 
+    res.status(201).json({
+      status: "success",
+      data: null,
+      message: `login effectué avec succès !`,
+    });
   } catch (e) {
     next(e)
   }
@@ -190,6 +193,7 @@ exports.logout = async (req, res, next) => {
 
   res.status(200).json({
       status: "success",
+      data: null,
       message: "Déconnexion réussie"
   });
 

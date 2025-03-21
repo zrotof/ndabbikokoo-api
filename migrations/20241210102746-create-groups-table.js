@@ -20,7 +20,8 @@ module.exports = {
       },
       isCreatedByMahol: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true
+        defaultValue: true,
+        allowNull: false
     },
       name: {
         type: Sequelize.STRING,

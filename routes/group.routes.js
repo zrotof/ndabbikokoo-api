@@ -1,4 +1,5 @@
 const router = require('express').Router(); 
+const passport = require("passport");
 
 const { 
     getGroups,
@@ -15,7 +16,7 @@ router.delete('/:id', deleteGroup);
 router.get('/:id/members', getGroupMembersByGroupId);
 router.get('/:id/all', getGroupWithMembersByGroupId);
 router.get('/:id', getGroupById);
-router.get('', getGroups);
+router.get('', passport.authenticate("staff-jwt", { session: false }), getGroups);
 router.post('', createGroup);
 
 module.exports = router;

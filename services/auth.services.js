@@ -1,3 +1,10 @@
+const {
+  NotFoundError,
+  CustomError,
+  AccountNotValidatedError,
+  InvalidCredentialsError
+} = require("../utils/errors");
+
 
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -9,12 +16,7 @@ const { models, sequelize } = require("../models");
 const { defaultBlockingTime, tokenLifeTimeOnLogin, maxFailedLoginAttempts } = require("../config/dot-env");
 const authHelpers = require("../helpers/auth.helpers");
 
-const {
-  NotFoundError,
-  CustomError,
-  AccountNotValidatedError
-} = require("../utils/errors");
-
+const staffService = require('../services/staff.services');
 
 const { generateToken, verifyToken } = require("../utils/jwt.utils");
 const { isPasswordValid } = require("../helpers/password.helpers");
@@ -75,6 +77,76 @@ class AuthService {
     await authHelpers.handleSuccessfulLogin(user, attempts, defaultBlockingTime);
 
     const token = await generateToken(user.id, tokenLifeTimeOnLogin);
+    
+    return token;
+  
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async loginStaff (email, password) {
+    try {
+  
+      // Recherche de l'utilisateur par email
+      const staff = await staffService.getStaffByEmail(email);
+  
+      if (!staff) {
+        throw new NotFoundError(
+          "Données incorrectes! Veuillez vérifier votre email ou votre mot de passe !"
+        );
+      }
+  
+/*
+      // Vérification si le compte est validé
+      if (!staff.isAccountValidated) {
+        throw new AccountNotValidatedError(
+          `Votre compte n'a pas encore été validé! Veuillez cliquer sur le lien de validation transmis par mail à ${user.email}.`
+        );
+      }
+
+
+  
+      const resetUserPassword = await models.UserPasswordResetRequest.findOne({
+        where: {
+          userId: user.id,
+        },
+      });
+  
+      if(resetUserPassword){
+        throw new CustomError("Vous ne pouvez vous connecter car une demande de changement de mot de passe est déjà en cours. Veuillez vérifier votre email pour le lien de réinitialisation de ce dernier.",403)
+      }
+  
+      // Recherche des tentatives de connexion par utilisateur
+      let attempts = await models.LoginAttempt.findOne({
+        where: {
+          userId: user.id
+        },
+      });
+
+      // Gestion du blocage si des tentatives existent pour cet utilisateur
+      if (attempts && !user.canAuthenticate) {
+        const isBlockDurationPassed = Date.now() > attempts.blockUntil;
+        if (isBlockDurationPassed) {
+          await authHelpers.resetLoginAttempts(user, attempts);
+        } else {
+          await authHelpers.handleBlockedUser(attempts, defaultBlockingTime);
+        }
+      }
+*/
+    const isValid = isPasswordValid(password, staff.password, staff.salt);
+    if (!isValid) {
+
+      throw new InvalidCredentialsError(
+        `Paramètres de connexion erronés`
+      );
+  
+      //await authHelpers.handleFailedLogin(user, attempts, maxFailedLoginAttempts, defaultBlockingTime);
+    }
+
+    //await authHelpers.handleSuccessfulLogin(user, attempts, defaultBlockingTime);
+
+    const token = await generateToken(staff.id, tokenLifeTimeOnLogin);
     
     return token;
   

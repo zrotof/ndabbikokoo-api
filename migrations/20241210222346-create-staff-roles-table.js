@@ -3,20 +3,20 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("StaffsRoles", {
+    await queryInterface.createTable("StaffRoles", {
       staffId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "Staffs", key: "id" },
         onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        onUpdate: "CASCADE"
       },
       roleId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: { model: "Roles", key: "id" },
         onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        onUpdate: "CASCADE"
       },
       createdAt: {
         allowNull: false,
@@ -30,6 +30,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('StaffsRoles');
-  },
-};
+    await queryInterface.dropTable('StaffRoles');
+  }
+}

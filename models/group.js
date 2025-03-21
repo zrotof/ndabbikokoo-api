@@ -28,7 +28,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       isCreatedByMahol: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true
+        defaultValue: true,
+        allowNull: false
       },
       name: {
         type: DataTypes.STRING,

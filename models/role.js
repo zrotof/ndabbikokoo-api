@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       Role.belongsToMany(models.Staff, { through: 'StaffRoles', foreignKey: 'roleId' });
     }
   }
+  
   Role.init(
     {
       name: {

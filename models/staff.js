@@ -2,10 +2,11 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
+
   class Staff extends Model {
     static associate(models) {
-      Staff.belongsTo(models.Subscriber, { foreignKey: 'subscriberId' });
-      Staff.belongsToMany(models.Role, { through: 'StaffRoles', foreignKey: 'staffId' });
+      Staff.belongsTo(models.Subscriber, { foreignKey: 'subscriberId', as : 'subscriber' });
+      Staff.belongsToMany(models.Role, { through: 'StaffRoles', foreignKey: 'staffId', as: 'roles' });
       Staff.hasMany(models.Group, { foreignKey: 'representativeId' });
       Staff.hasMany(models.GroupStaff, { foreignKey: 'staffId' });
       Staff.hasMany(models.SolidarityAction, { foreignKey: 'staffId', as : 'solidariryActions' });
@@ -58,5 +59,6 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Staff",
     }
   );
+
   return Staff;
-};
+}

@@ -13,7 +13,6 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     const registrationNumber1 = generateRegistrationNumber(6);
     const registrationNumber2 = generateRegistrationNumber(6);
-    const registrationNumber3 = generateRegistrationNumber(6);
 
     // Create two Subscribers
     const subscribers = await queryInterface.bulkInsert(
@@ -37,9 +36,9 @@ module.exports = {
         },
         {
           subscriberRegistrationNumber: registrationNumber2,
-          firstname: "Jane",
-          lastname: "Doe",
-          sex: "Femme",
+          firstname: "Samuel",
+          lastname: "Mandeng",
+          sex: "Homme",
           address: "456 Rue de Tankoua",
           postalCode: "75000",
           country: "France",
@@ -50,23 +49,7 @@ module.exports = {
           areRgpdConsentAccepted: true,
           createdAt: new Date(),
           updatedAt: new Date(),
-        },
-        {
-          subscriberRegistrationNumber: registrationNumber3,
-          firstname: "Sidoine",
-          lastname: "Atangana",
-          sex: "Homme",
-          address: "456 Rue de Tankoua",
-          postalCode: "75000",
-          country: "France",
-          town: "Paris",
-          phoneNumber: "45678943",
-          phoneCode: "+33",
-          areStatusInternalRegulationsAndMembershipAgreementAccepted: true,
-          areRgpdConsentAccepted: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
+        }
       ],
       { returning: true }
     );
@@ -74,11 +57,10 @@ module.exports = {
     // Get the subscriberIds of the newly created subscribers
     const subscriberId1 = subscribers[0].id;
     const subscriberId2 = subscribers[1].id;
-    const subscriberId3 = subscribers[2].id;
 
     const passHash1 = generateHashedPasswordAndSalt("john");
-    const passHash2 = generateHashedPasswordAndSalt("jane");
-    const passHash3 = generateHashedPasswordAndSalt("test");
+    const passHash2 = generateHashedPasswordAndSalt("manduel21");
+
     // Create two Users for the Subscribers
     await queryInterface.bulkInsert(
       "Users",
@@ -91,31 +73,19 @@ module.exports = {
           isAccountValidated: true,
           isEmailConfirmed: true,
           salt: passHash1.salt,
-          status: SubscriberStatusEnum.ENATTENTE,
+          status: SubscriberStatusEnum.ACTIF,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
           subscriberId: subscriberId2,
-          email: "jane@maholdiaspora.com",
+          email: "manduel21@gmail.com",
           password: passHash2.hash,
           canAuthenticate: true,
           isAccountValidated: true,
           isEmailConfirmed: true,
           salt: passHash2.salt,
-          status: SubscriberStatusEnum.DECEDE,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          subscriberId: subscriberId3,
-          email: "manduel21@gmail.com",
-          password: passHash3.hash,
-          canAuthenticate: false,
-          isAccountValidated: false,
-          isEmailConfirmed: true,
-          salt: passHash3.salt,
-          status: SubscriberStatusEnum.ENATTENTE,
+          status: SubscriberStatusEnum.ACTIF,
           createdAt: new Date(),
           updatedAt: new Date(),
         }
@@ -128,15 +98,15 @@ module.exports = {
     // Assume roles already exist and we will link them to the users
     // Query roles to get the roleIds for 'Admin' and 'Member'
     const roles = await queryInterface.sequelize.query(
-      'SELECT id, name FROM "Roles" WHERE name IN (:roleNames)',
+      'SELECT id, name, code FROM "Roles" WHERE code IN (:roleCodes)',
       {
-        replacements: { roleNames: ["Admin", "Member"] },
+        replacements: { roleCodes: ["admin", "member"] },
         type: Sequelize.QueryTypes.SELECT,
       }
     );
 
-    const adminRoleId = roles.find((role) => role.name === "Admin")?.id;
-    const memberRoleId = roles.find((role) => role.name === "Member")?.id;
+    const adminRoleId = roles.find((role) => role.code === "admin")?.id;
+    const memberRoleId = roles.find((role) => role.code === "member")?.id;
 
     // Check if the roles exist and link them to the users
     if (adminRoleId && memberRoleId) {
@@ -152,13 +122,7 @@ module.exports = {
           roleId: memberRoleId,
           createdAt: new Date(),
           updatedAt: new Date(),
-        },
-        {
-          subscriberId: subscriberId3,
-          roleId: adminRoleId,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
+        }
       ]);
     }
   },

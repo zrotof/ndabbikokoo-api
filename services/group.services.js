@@ -54,6 +54,60 @@ class GroupService {
     }
   }
 
+  async getGroupsAffectedToStaff(staffId, queries) {
+    try {
+
+      let whereCondition = {}
+
+      if(queries.groupType){
+        whereCondition = {
+          ...whereCondition,
+          isCreatedByMahol : queries.isCreatedByMahol
+        }
+      }
+
+      if(queries.isActive){
+          whereCondition = {
+              ...whereCondition,
+              isActive : queries.isActive === true || queries.isActive === 'true' 
+          }
+      }
+
+      const groups = await models.Group.findAll({
+        attributes: [
+          "id",
+          "name",
+          "country",
+          "town",
+          "groupRegistrationNumber",
+          "createdAt",
+          [
+            sequelize.fn("COUNT", sequelize.col("subscriber.id")),
+            "subscriberCount"
+          ],
+        ],
+        where : whereCondition,
+        include: [
+          {
+            model: models.Subscriber,
+            as: 'subscriber',
+            attributes: [],
+          },
+          {
+            model: models.GroupStaff,
+            where: { staffId: staffId },
+            attributes: []
+          }
+        ],
+        group: ["Group.id"],
+      });
+
+      return groups;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getGroupWithMembersByGroupId(id){
     try {
       const groupWithMembers = await models.Group.findByPk(id,{
@@ -205,7 +259,6 @@ class GroupService {
           isUnique = true;
         }
       }
-  
   
       groupDataToSave = {
         ...groupDataToSave,

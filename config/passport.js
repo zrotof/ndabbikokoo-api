@@ -39,17 +39,19 @@ module.exports = (passport) => {
     })
   );
 
-  // The JWT payload is passed into the verify callback
+
   passport.use('staff-jwt', new JwtStrategy(options, async (payload, done) => {
     try {
-      const staff = await models.Staff.findOne({ where: { email: payload.sub } });
-    
+      
+      const staff = await models.Staff.findByPk(payload.sub, {
+        attributes : ["id"]
+      });
+
       if (!staff) {
         return done(null, false, { message: 'Invalid token' });
       }
       
-      // Si le membre du staff est trouvé, renvoyer l'objet staff
-      return done(null, staff);
+      return done(null, staff.id);
       } catch (error) {
       throw error;
     }

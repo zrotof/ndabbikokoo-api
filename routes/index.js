@@ -7,7 +7,8 @@ const familyRoutes = require('./family.routes');
 const groupRoutes = require('./group.routes');
 const roleRoutes = require('./role.routes');
 const rubricRoute = require('./article-rubric.routes');
-const staffRoutes = require('./staff.routes');
+const staffRequestRoute = require('./staff-request.routes');
+const staffRoute = require('./staff.routes');
 const subscriberRoutes = require('./subscriber.routes');
 const userRoutes = require('./user.routes');
 
@@ -19,7 +20,8 @@ router.use("/families", familyRoutes);
 router.use("/groups", groupRoutes);
 router.use("/roles", roleRoutes);
 router.use("/rubrics", rubricRoute);
-router.use("/staff", staffRoutes)
+router.use('/staffs-requests', staffRequestRoute);
+router.use("/staffs", staffRoute);
 router.use("/subscribers", subscriberRoutes)
 router.use("/users", userRoutes);
 

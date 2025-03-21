@@ -7,7 +7,9 @@ module.exports = {
   maxFailedLoginAttempts: process.env.MAX_FAILED_LOGIN_ATTEMPTS,
   tokenLifeTimeOnLogin : process.env.TOKEN_LIFE_TIME_ON_LOGIN,
   tokenLifeTimeOnIdRequest : process.env.TOKEN_LIFE_TIME_ON_ID_REQUEST,
+  tokenLifeTimeOnStaffCreationRequest : process.env.TOKEN_LIFE_TIME_ON_STAFF_REQUEST,
   clientBaseUrl: process.env.CLIENT_BASE_URL,
+  clientAdminBaseUrl: process.env.CLIENT_ADMIN_BASE_URL,
   supraAdminEmail: process.env.SUPRA_ADMIN,
   db: {
     name: process.env.DB_NAME,

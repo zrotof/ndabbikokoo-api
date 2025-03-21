@@ -99,7 +99,7 @@ exports.deleteUser = async (req, res, next) => {
 
 exports.retrieveConnectedUser = async (req, res, next) => {
     try {
-        const userId = req.user
+        const userId = req.user;
 
         const user = await getUserWithRolesById(userId);
 

@@ -9,7 +9,7 @@ module.exports = {
         allowNull: false,
         references: { model: "Subscribers", key: "id" },
         onDelete: "CASCADE",
-        onUpdate: "CASCADE",
+        onUpdate: "CASCADE"
       },
       roleId: {
         type: Sequelize.INTEGER,

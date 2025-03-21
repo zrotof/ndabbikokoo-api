@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       UserPasswordResetRequest.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
     }
   }
+  
   UserPasswordResetRequest.init({
     userId: {
       type: DataTypes.INTEGER,

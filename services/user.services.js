@@ -183,8 +183,7 @@ exports.createUser = async (userDataToSave, transaction) => {
   }
 };
 
-exports.updateUser = async (userId, userData, roleNames) => {
-  const transaction = await sequelize.transaction();
+exports.updateUser = async (userId, userData, roleNames, transaction) => {
 
   try {
     const userToEdit = await models.User.findByPk(userId);

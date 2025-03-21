@@ -3,6 +3,7 @@ node_modules/
 
 # Environment variables
 .env
+.htaccess
 
 # OS-specific files
 .DS_Store

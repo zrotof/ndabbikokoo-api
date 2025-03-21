@@ -1,4 +1,4 @@
-const { clientBaseUrl } = require("../config/dot-env");
+const { clientBaseUrl, clientAdminBaseUrl } = require("../config/dot-env");
 const { o2switch } = require('../config/dot-env');
 
 exports.accountValidationTemplate = async (name) => {
@@ -533,3 +533,171 @@ exports.identicationWithAttachmentsMailTemplate = async(subscriberName, email, r
   </html>
   `
 }
+
+exports.staffRequestMailTemplate = async (mailObject) => {
+  return `
+  <html>
+    <head>
+      <style>
+        *{
+          margin: 0;
+          padding: 0;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+          box-sizing: border-box;
+          -moz-box-sizing: border-box;
+        }
+        body {
+          background-color: #f2f2f2;
+        }
+        .container {
+          width: 100%;
+          margin: 0 auto;
+          padding: 20px 20px;          
+        }
+        p{
+          font-size: 15px;
+          line-height: 25px;
+        }
+        .greeting{
+          margin-bottom : 30px;
+        }
+        .token{
+          display: block;
+            text-decoration: none;
+            font-size: 16px;
+            color: #fff !important;
+            font-weight: bold;
+            background-color : #7fbbd7;
+            padding: 10px 25px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+            width: fit-content
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <p class="greeting">Cher(e) ${mailObject.firstname},</p>
+        <p>Vous avez étés invités à rejoindre le staff de Mahol Diaspora avec pour rôle(s) : ${mailObject.roleStringifiedNames}. </p>
+        <p>Pour accéder à votre espace d'administration, veuillez cliquer sur le lien ci-dessous et définir votre mot de passe.</p>
+        <a class="token" href="${clientAdminBaseUrl}/staffs/valider-invitations?firstname=${mailObject.firstname}&email=${mailObject.emailPro}&token=${mailObject.token}" target="_blank"> Je définis mon mot de passe </a>
+        <p>
+            <b>NB : </b> Pour toutes questions, écrivez-nous à l'adresse ${o2switch.contact}.
+        </p>
+      </div>
+    </body>
+  </html>
+`;
+};
+
+exports.succeedStaffAccountCreationMailTemplate = async (firstname) => {
+  return `
+  <html>
+    <head>
+      <style>
+        *{
+          margin: 0;
+          padding: 0;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+          box-sizing: border-box;
+          -moz-box-sizing: border-box;
+        }
+        body {
+          background-color: #f2f2f2;
+        }
+        .container {
+          width: 100%;
+          margin: 0 auto;
+          padding: 20px 20px;          
+        }
+        p{
+          font-size: 15px;
+          line-height: 25px;
+        }
+        .greeting{
+          margin-bottom : 30px;
+        }
+        .token{
+          display: block;
+            text-decoration: none;
+            font-size: 16px;
+            color: #fff !important;
+            font-weight: bold;
+            background-color : #7fbbd7;
+            padding: 10px 25px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+            width: fit-content
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <p class="greeting">Cher(e) ${firstname},</p>
+        <p>Félicitation, vous faites désormais partie du staff de Mahol </p>
+        <p>Pour accéder à votre espace d'administration, veuillez cliquer sur le lien ci-dessous et vous connecter</p>
+        <a class="token" href="${clientAdminBaseUrl}/se-connecter" target="_blank">Se Connecter</a>
+        <p>
+            <b>NB : </b> Pour toutes questions, écrivez-nous à l'adresse ${o2switch.contact}.
+        </p>
+      </div>
+    </body>
+  </html>
+`;
+};
+
+exports.succeedGroupAffectationMailTemplate = async (firstname) => {
+  return `
+  <html>
+    <head>
+      <style>
+        *{
+          margin: 0;
+          padding: 0;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+          box-sizing: border-box;
+          -moz-box-sizing: border-box;
+        }
+        body {
+          background-color: #f2f2f2;
+        }
+        .container {
+          width: 100%;
+          margin: 0 auto;
+          padding: 20px 20px;          
+        }
+        p{
+          font-size: 15px;
+          line-height: 25px;
+        }
+        .greeting{
+          margin-bottom : 30px;
+        }
+        .token{
+          display: block;
+            text-decoration: none;
+            font-size: 16px;
+            color: #fff !important;
+            font-weight: bold;
+            background-color : #7fbbd7;
+            padding: 10px 25px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+            width: fit-content
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <p class="greeting">Cher(e) ${firstname},</p>
+        <p>Un nouveau groupe vous a été affecté ou retiré, veuillez-vous connecter pour en prendre connaissance. </p>
+
+        <a class="token" href="${clientAdminBaseUrl}/se-connecter" target="_blank">Se Connecter</a>
+        <p>
+            <b>NB : </b> Pour toutes questions, écrivez-nous à l'adresse ${o2switch.contact}.
+        </p>
+      </div>
+    </body>
+  </html>
+`;
+};

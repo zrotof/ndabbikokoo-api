@@ -13,7 +13,10 @@ const {
   guestInvitationMailTemplate,
   groupValidationMailTemplate,
   idRequestTemplate,
-  identicationWithAttachmentsMailTemplate
+  identicationWithAttachmentsMailTemplate,
+  staffRequestMailTemplate,
+  succeedStaffAccountCreationMailTemplate,
+  succeedGroupAffectationMailTemplate
 } = require("../templates/mails.templates");
 
 class MailService {
@@ -205,6 +208,60 @@ class MailService {
           content: file.buffer,          
           contentType: file.mimetype
         }))
+      });
+
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async sendStaffRequestMail(mailObject){
+    try {
+
+      const subject = "MAHOL DIASPORA : Accès à votre compte administrateur";
+      const message = await staffRequestMailTemplate(mailObject)
+
+      await transporter.sendMail({
+        from: o2switch.router,
+        to: mailObject.emailPro,
+        subject: subject,
+        html: message
+      });
+
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async sendSucceedStaffRegisteredMailResponse(mailObject){
+    try {
+
+      const subject = "MAHOL DIASPORA : compte administrateur créé";
+      const message = await succeedStaffAccountCreationMailTemplate(mailObject.firstname)
+
+      await transporter.sendMail({
+        from: o2switch.router,
+        to: mailObject.emailPro,
+        subject: subject,
+        html: message
+      });
+
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async sendSucceedGroupAffectationMailResponse(mailObject){
+    try {
+
+      const subject = "MAHOL DIASPORA : Modification De Groupe ";
+      const message = await succeedGroupAffectationMailTemplate(mailObject.firstname)
+
+      await transporter.sendMail({
+        from: o2switch.router,
+        to: mailObject.emailPro,
+        subject: subject,
+        html: message
       });
 
     } catch (error) {

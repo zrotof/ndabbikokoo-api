@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       Subscriber.hasOne(models.User, { foreignKey: 'subscriberId', as: 'user', onDelete: 'CASCADE' });
       Subscriber.belongsToMany(models.Role, { through: 'SubscriberRoles', foreignKey: 'subscriberId', as : 'roles' });
       Subscriber.hasOne(models.Group, { foreignKey: 'representativeId', as: 'representative' });
+      Subscriber.hasOne(models.StaffRequest, { foreignKey: 'subscriberId', as: 'staffRequest' });
       Subscriber.hasMany(models.Family, { foreignKey: 'subscriberId', as: 'families' });
       Subscriber.hasOne(models.Image, { foreignKey: 'imageableId', constraints: false, scope: {
         imageableType: imageableTypeEnum.SUBSCRIBER
@@ -48,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: {
             msg: 'Veuillez renseigner votre/vos prénom(s) !'
           }
-        } 
+        }
       },
       lastname: {
         type: DataTypes.STRING,
@@ -57,7 +58,7 @@ module.exports = (sequelize, DataTypes) => {
           notEmpty: {
             msg: 'Veuillez renseigner votre/vos nom(s) !'
           }
-        } 
+        }
       },
       marriedName: {
         type: DataTypes.STRING,
