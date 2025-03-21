@@ -1,8 +1,7 @@
 const { clientBaseUrl, clientAdminBaseUrl } = require("../config/dot-env");
-const { o2switch } = require('../config/dot-env');
+const { o2switch } = require("../config/dot-env");
 
 exports.accountValidationTemplate = async (name) => {
-
   return `
    <html>
      <head>
@@ -47,22 +46,20 @@ exports.accountValidationTemplate = async (name) => {
        <div class="container">
           <p>Cher(e) ${name},</p>
           <p>
-          Votre compte a bien été validé par les administrateurs de Mahol. Vous pouvez désormais vous connecter et profiter de toutes les fonctionnalités de la plateforme.
+            Vos informations ont bien été pris en compte et votre compte a été crée. 
+          </p>
+          <p>
+            Vous pouvez vous connecter.
           </p>
           <a class="token" href="${clientBaseUrl}/se-connecter" target=blank> Se connecter </a>
-          
        </div>
-  
      </body>
    </html>
   `;
-  
-  return htmlContent;
-  }
+};
 
 exports.passwordInitialisationRequestTemplate = async (name, token) => {
-
-return `
+  return `
  <html>
    <head>
      <style>
@@ -105,19 +102,16 @@ return `
    <body>
      <div class="container">
         <p>Cher(e) ${name},</p>
-        <p>Nous avons bien pris en compte votre désir de changer de mot de passe . Pour ce faire veuiller cliquer sur le bouton ci après.</p>
-        <a class="token" href="${clientBaseUrl}/changer-mot-de-passe?token=${token}" target=blank> Changer vore mot de passe </a>
+        <p>Vous voulez changer de mot de passe ? Cliquez sur le bouton ci-dessous.</p>
+        <a class="token" href="${clientBaseUrl}/changer-mot-de-passe?token=${token}" target=blank> Je change mon mot de passe </a>
         <p>
-          <b>NB :</b> Si vous n'êtes pas à l'origine de la création de ce compte, écrivez-nous à l'adresse contact@purs.cm pour que nous supprimions ce compte.
+          Si vous n'êtes pas à l'orgine de la création de ce compte, veuillez nous en informer à l'adresse ${o2switch.contact}
         </p>
      </div>
-
    </body>
  </html>
 `;
-
-return htmlContent;
-}
+};
 
 exports.emailVerificationTemplate = async (name, token) => {
   return `
@@ -163,17 +157,18 @@ exports.emailVerificationTemplate = async (name, token) => {
     <body>
       <div class="container">
         <p class="greeting">Cher(e) ${name},</p>
-        <p>Votre compte a bien été créé et il ne vous reste plus qu'à le valider pour pouvoir y accéder. </p>
-        <p>Pour ce faire, veuiller cliquer sur le bouton ci-après!</p>
-        <a class="token" href="${clientBaseUrl}/valider-email?token=${token}" target=blank> Je vérifie mon email </a>
+        <p>MAHÒL : Compte crée </p>
+        <p>Vos informations ont bien été pris en compte, veuillez cliquer sur le bouton ci-dessous pour valider votre adresse email.</p>
+        <a class="token" href="${clientBaseUrl}/valider-email?token=${token}" target=blank> Je valide mon email </a>
         <p>
-            <b>NB :</b> Si vous n'êtes pas à l'origine de la création de ce compte, écrivez-nous à l'adresse ${o2switch.contact} pour que nous supprimions ce compte.
+            <b>NB :</b> Si vous n'êtes pas à l'orgine de la création de ce compte, veuillez nous en informer à l'adresse ${o2switch.contact}.
         </p>
       </div>
     </body>
   </html>
 `;
 };
+
 
 exports.suceedEmailVerificationTemplate = async (name) => {
   return `
@@ -207,14 +202,14 @@ exports.suceedEmailVerificationTemplate = async (name) => {
     <body>
       <div class="container">
         <p class="greeting">Cher(e) ${name},</p>
+        <p>Vous avez validé votre email</p>
+        <p>Nous traitons les information que vous avez fourni. Vous recevrez un email lorsque votre compte sera crée.</p>
         <p>
           Nous avons pu vérifier que vous êtes bienle propriétaire de l'adresse email que vous avez fournie.
         </p>
+        
         <p>
-          Cependant, nous devons encore procédé à des vérifications des  informations que vus avez fournies lors de la création de votre compte. Une fois ces vérifications effectuées, vous recevrez un email vous informant de la validation de votre compte.
-        </p>
-        <p>
-            <b>NB :</b> Si vous n'êtes pas à l'origine de la création de ce compte, écrivez-nous à l'adresse ${o2switch.contact} pour que nous supprimions ce compte.
+            <b>NB :</b> Si vous n'êtes pas à l'orgine de la création de ce compte, veuillez nous en informer à l'adresse ${o2switch.contact}.
         </p>
       </div>
     </body>
@@ -222,7 +217,9 @@ exports.suceedEmailVerificationTemplate = async (name) => {
 `;
 };
 
-exports.groupAssignmentMailTemplate = async(subscriberName, groupName) => {
+
+
+exports.groupAssignmentMailTemplate = async (subscriberName, groupName) => {
   return `
 <html>
   <head>
@@ -259,14 +256,20 @@ exports.groupAssignmentMailTemplate = async(subscriberName, groupName) => {
   <body>
     <div class="container">
       <p>Cher(e) ${subscriberName},</p>
-      <p>Vous faites désormais partie du groupe ${groupName}.</p>
+      <p>Vous êtes désormais membre du groupe ${groupName}.</p>
     </div>
   </body>
 </html>
-`
-}
+`;
+};
 
-exports.guestInvitationMailTemplate = async (firstname, lastname, email, groupName, representantName) => {
+exports.guestInvitationMailTemplate = async (
+  firstname,
+  lastname,
+  email,
+  groupName,
+  representantName
+) => {
   return `
   <html>
     <head>
@@ -304,7 +307,8 @@ exports.guestInvitationMailTemplate = async (firstname, lastname, email, groupNa
       <div class="container">
         <p>Bonjour ${firstname} ${lastname},</p>
         <p>
-          Vous avez été invité(e) par ${representantName} à rejoindre le groupe ${groupName} sur notre plateforme Mahol. Ce groupe vous permettra de [bénéfices ou objectifs du groupe, par ex. : partager des idées, collaborer, accéder à des ressources exclusives].
+          Vous avez été invité(e) par ${representantName} à rejoindre le groupe ${groupName} sur notre plateforme Mahol Diaspora. 
+          Ce groupe vous permettra de [bénéfices ou objectifs du groupe, par ex. : partager des idées, collaborer, accéder à des ressources exclusives].
         </p>
         <br>
         <p>
@@ -322,10 +326,10 @@ exports.guestInvitationMailTemplate = async (firstname, lastname, email, groupNa
           </li>
         </ol>
 
-        <a class="token" href="${clientBaseUrl}/nous-rejoindre/particulier?email=${email}&firstname=${firstname}&lastname=${lastname}" target=blank >Rejoindre le groupe</a>
+        <a class="token" href="${clientBaseUrl}/nous-rejoindre/particulier?email=${email}&firstname=${firstname}&lastname=${lastname}" target=blank >Je rejoins le groupe</a>
 
         <p>
-          Si vous avez des questions ou rencontrez des difficultés, contactez-nous à ${o2switch.contact}.
+          Si vous avez des questions ou rencontrez des difficultés, contactez-nous à l'adresse ${o2switch.contact}.
         </p>
         <p>
           À très bientôt,
@@ -337,8 +341,8 @@ exports.guestInvitationMailTemplate = async (firstname, lastname, email, groupNa
       </div>
     </body>
   </html>
-  `
-}
+  `;
+};
 
 exports.groupValidationMailTemplate = async (groupCreatorName, groupName) => {
   return `
@@ -378,7 +382,8 @@ exports.groupValidationMailTemplate = async (groupCreatorName, groupName) => {
       <div class="container">
         <p>Bonjour ${groupCreatorName},</p>
         <p>
-          Votre groupe ${groupName} a été validé par les administrateurs de Mahol. En vous connectant vous aurez la possibilité d'inviter des membres à rejoindre votre groupe. 
+          Votre groupe ${groupName} a été validé par les administrateurs de Mahol. 
+          En vous connectant vous aurez la possibilité d'inviter des membres à rejoindre votre groupe. 
         </p>
         <br>
 
@@ -397,14 +402,12 @@ exports.groupValidationMailTemplate = async (groupCreatorName, groupName) => {
       </div>
     </body>
   </html>
-  `
-}
+  `;
+};
 
-exports.succeedPasswordInitialisationTemplate = async() => {
+exports.succeedPasswordInitialisationTemplate = async () => {};
 
-}
-
-exports.idRequestTemplate = async(subscriberName, token) => {
+exports.idRequestTemplate = async (subscriberName, token) => {
   return `
   <html>
     <head>
@@ -442,7 +445,8 @@ exports.idRequestTemplate = async(subscriberName, token) => {
       <div class="container">
         <p>Bonjour ${subscriberName},</p>
         <p>
-          Nous souhaitons vérifier votre identité et valider définitivement votre compte. Pour cela, nous vous prions de bien vouloir nous faire parvenir votre pièce d'identité . 
+          Nous souhaitons vérifier votre identité et valider définitivement votre compte. 
+          Pour cela, nous vous prions de bien vouloir nous faire parvenir votre pièce d'identité . 
         </p>
         <p>
           Pour nous envoyer votre document d'identification, veillez cliquer sur le boutton ci-après.
@@ -464,10 +468,15 @@ exports.idRequestTemplate = async(subscriberName, token) => {
       </div>
     </body>
   </html>
-  `
-}
+  `;
+};
 
-exports.identicationWithAttachmentsMailTemplate = async(subscriberName, email, resgistrationNumber, identificationType) => {
+exports.identicationWithAttachmentsMailTemplate = async (
+  subscriberName,
+  email,
+  resgistrationNumber,
+  identificationType
+) => {
   return `
   <html>
     <head>
@@ -531,8 +540,8 @@ exports.identicationWithAttachmentsMailTemplate = async(subscriberName, email, r
       </div>
     </body>
   </html>
-  `
-}
+  `;
+};
 
 exports.staffRequestMailTemplate = async (mailObject) => {
   return `

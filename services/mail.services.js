@@ -23,7 +23,7 @@ class MailService {
 
   async sendAccountValidationMailResponse(mailObject) {
     try {
-      const subject = "MAHÒL : Compte validé";
+      const subject = "MAHÒL : Compte créé";
       const message = await accountValidationTemplate(mailObject.username);
   
       await transporter.sendMail({
@@ -88,7 +88,7 @@ class MailService {
 
   async sendSucceedEmailVerificationMailResponse (name, email) {
     try {
-      const subject = "MAHÒL : Votre email est bien vérifiée !";
+      const subject = "MAHÒL : Votre email est bien vérifiée!";
       const message = await suceedEmailVerificationTemplate(name);
   
       await transporter.sendMail({

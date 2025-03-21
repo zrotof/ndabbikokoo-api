@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       filiation: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: false
       },
       email: {
         type: DataTypes.STRING,
@@ -37,30 +37,36 @@ module.exports = (sequelize, DataTypes) => {
       },
       sex: {
         type: DataTypes.ENUM(SexEnum.WOMAN, SexEnum.MAN),
-        allowNull: false,
+        allowNull: true,
+  /*
         validate: {
           notEmpty: {
             msg: "Veuillez renseigner votre sexe !"
           }
         } 
+  */
       },
       address: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+  /*
         validate: {
           notEmpty: {
             msg: "Veuillez renseigner son adresse !"
           }
         } 
+  */
       },
       postalCode: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+  /*
         validate: {
           notEmpty: {
             msg: "Veuillez renseigner son code postal !"
           }
         } 
+  */
       },
       country: {
         type: DataTypes.STRING,
@@ -73,12 +79,14 @@ module.exports = (sequelize, DataTypes) => {
       },
       town: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
+  /*
         validate: {
           notEmpty: {
             msg: "Veuillez renseigner sa ville de résidence!"
           }
         } 
+  */
       },
       phoneCode: {
         type: DataTypes.INTEGER,

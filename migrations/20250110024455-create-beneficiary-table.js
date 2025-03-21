@@ -26,7 +26,7 @@ module.exports = {
       },
       filiation: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: false
       },
       firstname: {
         type: Sequelize.STRING,
@@ -38,16 +38,16 @@ module.exports = {
       },
       sex: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         values : ["Femme", "Homme"]
       },
       address: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       postalCode: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       country: {
         type: Sequelize.STRING,
