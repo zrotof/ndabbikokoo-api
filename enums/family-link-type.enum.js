@@ -1,7 +1,7 @@
 const FamilyLinkTypeEnum = Object.freeze({
   CHILD: "Child",
-  PARENT: "Parent",
-  SPOUSE: "Spouse",
-});
+  MOTHER: "Mother",
+  FATHER: "Father"
+})
 
 module.exports = { FamilyLinkTypeEnum : FamilyLinkTypeEnum }

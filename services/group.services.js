@@ -116,11 +116,18 @@ class GroupService {
             model: models.Subscriber,
             as: 'subscriber',
             attributes: ['id', 'subscriberRegistrationNumber', 'firstname', 'lastname', 'town', 'country', 'phoneCode', 'phoneNumber', 'phoneCode'],
-            include:{
-              model: models.User,
-              as: 'user',
-              attributes: ['email']
-            }
+            include:[
+              {
+                model: models.User,
+                as: 'user',
+                attributes: ['email']
+              },
+              {
+                model: models.Image,
+                as: 'image',
+                attributes: ['url']
+              }
+            ]
           }
         ]
       });
@@ -148,8 +155,10 @@ class GroupService {
         phoneCode: mem.phoneCode,
         phoneNumber: mem.phoneNumber,
         town: mem.town,
+        country: mem.country,
         email: mem.user.email,
-        isRepresentative : mem.id === groupWithMembers.representativeId
+        isRepresentative : mem.id === groupWithMembers.representativeId,
+        image: mem.image.url
       }))
     }
 

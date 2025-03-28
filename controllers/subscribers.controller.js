@@ -44,6 +44,21 @@ exports.getSubscribers = async (req, res, next) => {
   }
 };
 
+exports.getTotalSubscribers = async(req, res, next) => {
+  try {
+
+    const totalSubscribers = await subscriberService.getTotalSubscribers();
+
+    return res.status(200).json({
+      status: "success",
+      data: totalSubscribers,
+      message: `Requêtte réussie!`,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 exports.getSubscriberById = async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -378,7 +393,9 @@ exports.editSubscriberProfile = async (req, res, next) => {
     if (town) subscriber.town = town;
     if (phoneNumber) subscriber.phoneNumber = phoneNumber;
 
-    await subscriberService.updateSubscriberById(id, subscriber);
+    if(phoneCode || address || postalCode || country || town || phoneNumber){
+      await subscriberService.updateSubscriberById(id, subscriber);
+    }
 
     if(file){
       const image = await imageService.getImageableIdAndimageableType(id, imageableTypeEnum.SUBSCRIBER);

@@ -10,9 +10,17 @@ const pathToKey = path.join(__dirname, "..", "rsa-keys", "id_rsa_pub.pem");
 const PUB_KEY = fs.readFileSync(pathToKey, "utf8");
 
 // At a minimum, you must pass the `jwtFromRequest` and `secretOrKey` properties
-const options = {
+const userOptions = {
   jwtFromRequest: ExtractJwt.fromExtractors([
-    (req) => req.cookies.token
+    (req) => req.cookies.user_token
+  ]),
+  secretOrKey: PUB_KEY,
+  algorithms: ["RS256"]
+};
+
+const staffOptions = {
+  jwtFromRequest: ExtractJwt.fromExtractors([
+    (req) => req.cookies.staff_token
   ]),
   secretOrKey: PUB_KEY,
   algorithms: ["RS256"]
@@ -22,7 +30,7 @@ const options = {
 module.exports = (passport) => {
 
   // The JWT payload is passed into the verify callback
-  passport.use('user-jwt', new JwtStrategy(options, async (payload, done) => {
+  passport.use('user-jwt', new JwtStrategy(userOptions, async (payload, done) => {
       try {
 
         const user = await models.User.findByPk(payload.sub);
@@ -40,7 +48,7 @@ module.exports = (passport) => {
   );
 
 
-  passport.use('staff-jwt', new JwtStrategy(options, async (payload, done) => {
+  passport.use('staff-jwt', new JwtStrategy(staffOptions, async (payload, done) => {
     try {
       
       const staff = await models.Staff.findByPk(payload.sub, {

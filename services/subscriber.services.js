@@ -5,34 +5,38 @@ const { CustomError, NotFoundError } = require("../utils/errors");
 const { isObjectEmpty } = require("../utils/parsing.utils");
 const groupServices = require("./group.services");
 const guestServices = require("./guest.services");
-const { generateRegistrationNumber } = require("../utils/generate-registration-number");
+const {
+  generateRegistrationNumber,
+} = require("../utils/generate-registration-number");
 
 class Subscriber {
-  
   async getSubscribers(queries) {
     try {
+      let whereCondition = {};
+      let userWhereCondition = {};
 
-    let whereCondition = {};
-    let userWhereCondition = {};
+      if (queries.searchTerm) {
+        let searchValue = `%${queries.searchTerm}%`;
 
-    if (queries.searchTerm) {
-      let searchValue = `%${queries.searchTerm}%`;
+        whereCondition[Op.or] = [
+          { firstname: { [Op.iLike]: searchValue } },
+          { lastname: { [Op.iLike]: searchValue } },
+          { subscriberRegistrationNumber: { [Op.iLike]: searchValue } },
+          { country: { [Op.iLike]: searchValue } },
+          { town: { [Op.iLike]: searchValue } },
+          { phoneNumber: { [Op.iLike]: searchValue } },
+        ];
 
-      whereCondition[Op.or] = [
-        { firstname: { [Op.iLike]: searchValue } },
-        { lastname: { [Op.iLike]: searchValue } },
-        { subscriberRegistrationNumber: { [Op.iLike]: searchValue } },
-        { country: { [Op.iLike]: searchValue } },
-        { town: { [Op.iLike]: searchValue } },
-        { phoneNumber: { [Op.iLike]: searchValue } },
-      ];
+        userWhereCondition[Op.or] = [{ email: { [Op.iLike]: searchValue } }];
+      }
 
-      userWhereCondition[Op.or] = [{ email: { [Op.iLike]: searchValue } }];
-    }
+      if (queries.isAccountValidated) {
+        userWhereCondition.isAccountValidated =
+          queries.isAccountValidated === "true" ? true : false;
+      }
 
-    let limit = queries.limit ? parseInt(queries.limit) : 10;
-    let offset = queries.offset ? parseInt(queries.offset) : 0;
-
+      let limit = queries.limit ? parseInt(queries.limit) : 10;
+      let offset = queries.offset ? parseInt(queries.offset) : 0;
 
       const subscribersList = await models.Subscriber.findAll({
         where: whereCondition,
@@ -46,16 +50,22 @@ class Subscriber {
           {
             model: models.User,
             as: "user",
-            attributes: ["email", "status", "isEmailConfirmed", "canAuthenticate"],
-            ...(Object.keys(userWhereCondition).length > 0 && { where: userWhereCondition }),
-            required: false
+            attributes: [
+              "email",
+              "status",
+              "isEmailConfirmed",
+              "canAuthenticate",
+            ],
+            ...(Object.keys(userWhereCondition).length > 0 && {
+              where: userWhereCondition,
+            }),
           },
           {
             model: models.Group,
             as: "group",
             attributes: ["id", "name"],
           },
-        ]
+        ],
       });
 
       const subscribers = subscribersList.map((item) => ({
@@ -88,6 +98,14 @@ class Subscriber {
     }
   }
 
+  async getTotalSubscribers() {
+    try {
+      return await models.Subscriber.count();
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getSubscriberById(subscriberId) {
     try {
       const subscriber = await models.Subscriber.findByPk(subscriberId, {
@@ -101,7 +119,12 @@ class Subscriber {
             model: models.Group,
             as: "group",
             attributes: ["id", "name", "representativeId"],
-          }
+          },
+          {
+            model: models.Image,
+            as: "image",
+            attributes: ["url"],
+          },
         ],
       });
 
@@ -137,6 +160,10 @@ class Subscriber {
         isGroupRepresentative:
           subscriber.group?.representativeId === subscriber.id,
       };
+
+      if(subscriber.image){
+        sub.image = subscriber.image.url
+      }
 
       return sub;
     } catch (error) {
@@ -175,7 +202,7 @@ class Subscriber {
       while (!isUnique) {
         const registrationNumber = generateRegistrationNumber(7);
         const existingGroup = await models.Subscriber.findOne({
-          where: { subscriberRegistrationNumber: registrationNumber }
+          where: { subscriberRegistrationNumber: registrationNumber },
         });
 
         if (!existingGroup) {
@@ -186,10 +213,12 @@ class Subscriber {
 
       const subscriberDataToSave = {
         ...subscriberData,
-        subscriberRegistrationNumber: uniqueRegistrationNumber
-      }
+        subscriberRegistrationNumber: uniqueRegistrationNumber,
+      };
 
-      return await models.Subscriber.create(subscriberDataToSave, { transaction });
+      return await models.Subscriber.create(subscriberDataToSave, {
+        transaction,
+      });
     } catch (error) {
       throw error;
     }

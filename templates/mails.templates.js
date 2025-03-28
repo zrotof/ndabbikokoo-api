@@ -169,7 +169,6 @@ exports.emailVerificationTemplate = async (name, token) => {
 `;
 };
 
-
 exports.suceedEmailVerificationTemplate = async (name) => {
   return `
   <html>
@@ -216,8 +215,6 @@ exports.suceedEmailVerificationTemplate = async (name) => {
   </html>
 `;
 };
-
-
 
 exports.groupAssignmentMailTemplate = async (subscriberName, groupName) => {
   return `

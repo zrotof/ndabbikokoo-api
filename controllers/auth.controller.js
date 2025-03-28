@@ -125,11 +125,14 @@ exports.loginSubscriber = async (req, res, next) => {
 
     const token = await authService.loginSubscriber(email,password);
 
-    res.cookie('token', token, {
+    const domain = clientBaseUrl.replace(/^https?:\/\//, "");
+
+    res.cookie('user_token', token, {
       httpOnly: true,
       secure: environment === 'production',
       maxAge: 3600 * 1000,
-      domain: +clientBaseUrl
+      sameSite: "Strict",
+      domain: environment === 'production' ? domain : 'localhost'
     });
 
     res.status(201).json({
@@ -148,12 +151,14 @@ exports.loginStaff = async (req, res, next) => {
     const { email, password } = req.body;
 
     const token = await authService.loginStaff(email,password);
+    const domain = clientAdminBaseUrl.replace(/^https?:\/\//, "");
 
-    res.cookie('token', token, {
+    res.cookie('staff_token', token, {
       httpOnly: true,
       secure: environment === 'production',
       maxAge: 3600 * 1000,
-      domain: +clientAdminBaseUrl
+      sameSite: "Strict",
+      domain: environment === 'production' ? domain : 'localhost'
     });
 
     res.status(201).json({
@@ -184,11 +189,39 @@ exports.isTokenValid = async (req, res, next) => {
   }
 }
 
-exports.logout = async (req, res, next) => {
+exports.logoutSubscriber = async (req, res, next) => {
   try {
-    res.clearCookie('token', {
+    const domain =  clientBaseUrl.replace(/^https?:\/\//, "");
+
+    res.clearCookie('user_token', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: environment === 'production',
+      maxAge: 0,
+      sameSite: "Strict",
+      domain: environment === 'production' ? domain : 'localhost'
+  });
+
+  res.status(200).json({
+      status: "success",
+      data: null,
+      message: "Déconnexion réussie"
+  });
+
+  } catch (e) {
+    next(e)
+  }
+}
+
+exports.logoutStaff = async (req, res, next) => {
+  try {
+    const domain =  clientAdminBaseUrl.replace(/^https?:\/\//, "");
+
+    res.clearCookie('staff_token', {
+      httpOnly: true,
+      secure: environment === 'production',
+      maxAge: 0,
+      sameSite: "Strict",
+      domain: environment === 'production' ? domain : 'localhost'
   });
 
   res.status(200).json({

@@ -6,13 +6,15 @@ const {
     loginSubscriber,
     loginStaff,
     isTokenValid,
-    logout
+    logoutSubscriber,
+    logoutStaff
 } = require("../controllers/auth.controller");
 
 router.post("/register-subscriber", registerSubscriber);
 router.post("/login-subscriber", loginSubscriber);
 router.post("/login-staff", loginStaff);
 router.post("/validate-token", isTokenValid);
-router.post("/logout", logout);
+router.post("/logout-subscriber", logoutSubscriber);
+router.post("/logout-staff", logoutStaff);
 
 module.exports = router;

@@ -30,8 +30,6 @@ const {
 } = require("../services/mail.services");
 
 const { getRemainingTime } = require("../utils/hour-convertion.utils");
-const { where } = require("sequelize");
-const { logger } = require("sequelize/lib/utils/logger");
 
 exports.getUsersWithRoles = async () => {
   try {
@@ -461,7 +459,7 @@ exports.validateUserEmailAccount = async (authHeader) => {
 
       if (user.isEmailConfirmed === true) {
         throw new CustomError(
-          `Nous sommes content de vous revoir ${user.Subscriber?.firstname}, votre compte a déjà été validé ! Vous pouvez vous connecter`,
+          `Nous sommes content de vous revoir ${user.subscriber?.firstname}, votre compte a déjà été validé ! Vous pouvez vous connecter`,
           200
         );
       }

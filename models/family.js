@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: false
       },
       filiation: {
-        type: DataTypes.ENUM(FamilyLinkTypeEnum.CHILD, FamilyLinkTypeEnum.PARENT, FamilyLinkTypeEnum.SPOUSE),
+        type: DataTypes.ENUM(FamilyLinkTypeEnum.FATHER, FamilyLinkTypeEnum.MOTHER),
         allowNull: false
       }
     },

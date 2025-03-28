@@ -15,7 +15,8 @@ const {
     registerSubscriberFamilyMember,
     editSubscriberFamilyMember,
     deleteSubscriberFamilyMember,
-    editSubscriberProfile
+    editSubscriberProfile,
+    getTotalSubscribers
  } = require('../controllers/subscribers.controller')
 
  router.put('/:subscriberId/assign-group/:groupId', assignSubscriberToGroup);
@@ -30,6 +31,7 @@ const {
  router.delete('/:id', deleteSubscriber);
  router.delete('/:id/families/:familyMemberId', deleteSubscriberFamilyMember);
  router.get('/:id/families', getSubscriberFamily);
+ router.get('/total', getTotalSubscribers);
  router.get('/:id', getSubscriberById);
  router.get('', getSubscribers);
 
