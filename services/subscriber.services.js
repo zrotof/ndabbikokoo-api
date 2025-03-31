@@ -9,6 +9,7 @@ const {
   generateRegistrationNumber,
 } = require("../utils/generate-registration-number");
 
+const { supraAdminEmail } = require("../config/dot-env");
 class Subscriber {
   async getSubscribers(queries) {
     try {
@@ -17,7 +18,7 @@ class Subscriber {
 
       if (queries.searchTerm) {
         let searchValue = `%${queries.searchTerm}%`;
-
+    
         whereCondition[Op.or] = [
           { firstname: { [Op.iLike]: searchValue } },
           { lastname: { [Op.iLike]: searchValue } },
@@ -27,13 +28,21 @@ class Subscriber {
           { phoneNumber: { [Op.iLike]: searchValue } },
         ];
 
-        userWhereCondition[Op.or] = [{ email: { [Op.iLike]: searchValue } }];
+        userWhereCondition[Op.or] = [
+          { email: { [Op.iLike]: searchValue } },
+        ];
       }
 
       if (queries.isAccountValidated) {
         userWhereCondition.isAccountValidated =
           queries.isAccountValidated === "true" ? true : false;
       }
+
+      userWhereCondition[Op.and] = [
+        {
+          '$user.email$': { [Op.ne]: supraAdminEmail },
+        }
+      ];
 
       let limit = queries.limit ? parseInt(queries.limit) : 10;
       let offset = queries.offset ? parseInt(queries.offset) : 0;

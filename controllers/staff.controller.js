@@ -7,7 +7,7 @@ const subscriberService = require("../services/subscriber.services");
 const mailServices = require("../services/mail.services");
 const roleService = require("../services/role.services")
 const groupStaffService = require("../services/group-staff.services");
-
+const groupDelegateService = require("../services/group-delegate.services");
 
 exports.retrieveConnectedStaff = async (req, res, next) => {
   try {
@@ -35,6 +35,42 @@ exports.getStaffs = async (req, res, next) => {
       data: staffs,
       message: `Liste des membres de staff trouvée!`,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getStaffGroupsById = async (req, res, next) => {
+  try {
+    const { staffId } = req.params;
+
+    await staffService.getStaffById(staffId);
+
+    const groups = await groupStaffService.getGroupsStaff(staffId);
+
+    return res.status(200).json({
+      status: "success",
+      data: groups,
+      message: `Liste des groupes trouvée!`,
+    });  
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getDeputyGroupsById = async (req, res, next) => {
+  try {
+    const { staffId } = req.params;
+
+    await staffService.getStaffById(staffId);
+
+    const groups = await groupDelegateService.getDeputyGroupsByDeputyId(staffId);
+
+    return res.status(200).json({
+      status: "success",
+      data: groups,
+      message: `Liste des groupes trouvée!`,
+    });  
   } catch (error) {
     next(error);
   }
@@ -92,29 +128,32 @@ exports.createStaff = async (req, res, next) => {
   }
 };
 
-exports.assignStaffToGroup = async (req, res, next) => {
+exports.assignGroupsToDelegate = async (req, res, next) => {
   const transaction = await sequelize.transaction();  
 
   try {
     const { staffId } = req.params;
-    const { groupsId } = req.body;
+    const { groupsId, deputyId } = req.body;
 
     const staff = await staffService.getStaffById(staffId);
+    const deputy = await staffService.getStaffById(deputyId);
 
-    const groupStaffToSave = {
-      staffId,
+    const groupsDelegateToSave = {
+      staffId: deputyId,
       groupsId
     }
 
-    const response = await groupStaffService.createGroupStaff(
-      groupStaffToSave,
+    console.log(groupsDelegateToSave);
+
+    const response = await groupDelegateService.createGroupsDelegate(
+      groupsDelegateToSave,
       transaction
     );
 
     if (response) {
       const mailObject = {
-        firstname: staff.subscriber.firstname,
-        emailPro: staff.email
+        firstname: deputy.subscriber.firstname,
+        emailPro: deputy.email
       }
 
       await mailServices.sendSucceedGroupAffectationMailResponse(mailObject);

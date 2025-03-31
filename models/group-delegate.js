@@ -5,17 +5,17 @@ module.exports = (sequelize, DataTypes) => {
   class GroupDelegate extends Model {
     static associate(models) {
       GroupDelegate.belongsTo(models.Group, {
-        foreignKey: 'groupId'
+        foreignKey: 'groupId', as : 'groups'
       });
-      GroupDelegate.belongsTo(models.Subscriber, {
-        foreignKey: 'subscriberId'
+      GroupDelegate.belongsTo(models.Staff, {
+        foreignKey: 'staffId', as : 'group'
       });
     }
   }
   
   GroupDelegate.init(
     {
-      subscriberId: {
+      staffId: {
         type: DataTypes.STRING,
         allowNull: false
       },

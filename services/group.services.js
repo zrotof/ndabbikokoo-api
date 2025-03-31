@@ -158,7 +158,7 @@ class GroupService {
         country: mem.country,
         email: mem.user.email,
         isRepresentative : mem.id === groupWithMembers.representativeId,
-        image: mem.image.url
+        image: mem?.image?.url
       }))
     }
 

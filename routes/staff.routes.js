@@ -5,10 +5,15 @@ const {
   createStaff,
   getStaffs,
   retrieveConnectedStaff,
-  assignStaffToGroup
+  assignStaffToGroup,
+  assignGroupsToDelegate,
+  getStaffGroupsById,
+  getDeputyGroupsById
 } = require("../controllers/staff.controller");
 
-router.post('/:staffId/assign-group', assignStaffToGroup);
+router.post('/:staffId/assign-group', assignGroupsToDelegate);
+router.get('/:staffId/groups-assigned', getDeputyGroupsById);
+router.get('/:staffId/groups', getStaffGroupsById);
 router.post("", createStaff);
 router.get(
   "/me",

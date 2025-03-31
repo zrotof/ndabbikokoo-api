@@ -1,5 +1,6 @@
 const { models, sequelize } = require("../models");
 const { tokenLifeTimeOnStaffCreationRequest } = require("../config/dot-env");
+const { Op } = require("sequelize");
 
 const {
   generateHashedPasswordAndSalt,
@@ -9,10 +10,16 @@ const {
 const { generateToken } = require("../utils/jwt.utils");
 const { NotFoundError } = require("../utils/errors");
 
+const { supraAdminEmail } = require('../config/dot-env');
+const groupDelegate = require("../models/group-delegate");
+
 class StaffService {
   async getStaffs() {
     try {
       const staffMembers = await models.Staff.findAll({
+        where: {
+          email: { [Op.ne]: supraAdminEmail }
+        },
         attributes: ["id", "email"],
         include: [
           {
@@ -32,8 +39,8 @@ class StaffService {
               "town",
               "country",
             ],
-          },
-        ],
+          }
+        ]     
       });
 
       return staffMembers;
@@ -87,6 +94,10 @@ class StaffService {
         attributes: ["id", "email", "createdAt"],
         include: [
           {
+            model: models.GroupDelegate,
+            as: "groupsDelegate",
+          },
+          {
             model: models.Role,
             as: "roles",
             through: {
@@ -115,13 +126,14 @@ class StaffService {
         );
       }
 
-      const { subscriber, roles, ...rest } = staff.toJSON();
+      const { subscriber, roles, groups, ...rest } = staff.toJSON();
       const { image, ...subscriberDetails } = subscriber;
       const { id, ...restSubscriberDetails } = subscriberDetails;
 
       const dataToRetrieve = {
         staff : {
           ...rest,
+          ...groups,
           ...restSubscriberDetails,
           subscriberId: id,
           image: image ? image.url : null

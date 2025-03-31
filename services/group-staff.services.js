@@ -1,4 +1,4 @@
-const { models } = require("../models");
+const { models, sequelize } = require("../models");
 const { CustomError } = require("../utils/errors");
 
 class GroupStaffService {
@@ -21,7 +21,6 @@ class GroupStaffService {
       const groupStaffEntries = ids.groupsId.map(groupId => ({
         staffId: ids.staffId,
         groupId,
-        startDate: new Date(),
       }));
   
       const result = await models.GroupStaff.bulkCreate(groupStaffEntries, { transaction });
@@ -29,6 +28,37 @@ class GroupStaffService {
       return result;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async getGroupsStaff(staffId) {
+    try {
+      const existingAssignments = await models.GroupStaff.findAll({
+        where: { staffId },
+        attributes: ['groupId'],
+        includes : [
+          {
+            model: models.Group,
+            as: 'group',
+            attributes: [
+              "id", 
+              "name", 
+              "country", 
+              "town", 
+              "groupRegistrationNumber", 
+              "createdAt",
+              [
+                sequelize.fn("COUNT", sequelize.col("subscriber.id")),
+                "subscriberCount"
+              ],
+            ],
+          }
+        ]
+      });
+
+      return existingAssignments;
+    } catch (error) {
+      throw error
     }
   }
 }

@@ -8,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
       Staff.belongsTo(models.Subscriber, { foreignKey: 'subscriberId', as : 'subscriber' });
       Staff.belongsToMany(models.Role, { through: 'StaffRoles', foreignKey: 'staffId', as: 'roles' });
       Staff.hasMany(models.Group, { foreignKey: 'representativeId' });
-      Staff.hasMany(models.GroupStaff, { foreignKey: 'staffId' });
+      Staff.hasMany(models.GroupStaff, { foreignKey: 'staffId', as : 'groups' });
+      Staff.hasMany(models.GroupDelegate, { foreignKey: 'staffId', as : 'groupsDelegate' });
       Staff.hasMany(models.SolidarityAction, { foreignKey: 'staffId', as : 'solidariryActions' });
     }
   }

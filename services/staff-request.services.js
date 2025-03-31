@@ -25,7 +25,7 @@ class StaffRequestService {
           {
             model: models.Subscriber,
             as: "subscriber",
-            attributes: ["firstname", "lastname", "phoneCode", "phoneNumber"],
+            attributes: ["firstname", "lastname", "phoneCode", "phoneNumber", "town", "country"],
             include: [
               {
                 model: models.User,

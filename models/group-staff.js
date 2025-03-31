@@ -22,15 +22,6 @@ module.exports = (sequelize, DataTypes) => {
       groupId: {
         type: DataTypes.STRING,
         allowNull: false
-      },
-      startDate: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Date.now()
-      },
-      endDate: {
-        type: DataTypes.DATE,
-        allowNull: true
       }
     },
     {

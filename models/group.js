@@ -8,6 +8,9 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'groupId', as: 'subscriber'
       });
       Group.hasMany(models.GroupStaff, {
+        foreignKey: 'groupId', as : 'groups'
+      });
+      Group.hasOne(models.GroupDelegate, {
         foreignKey: 'groupId'
       });
     }

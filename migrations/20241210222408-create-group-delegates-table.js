@@ -20,11 +20,11 @@ module.exports = {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
       },
-      subscriberId: {
+      staffId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Subscribers",
+          model: "Staffs",
           key: "id",
         },
         onUpdate: "CASCADE",

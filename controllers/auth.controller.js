@@ -1,9 +1,8 @@
-const { models, sequelize } = require("../models");
+const { sequelize } = require("../models");
 const { clientBaseUrl, clientAdminBaseUrl, environment } = require('../config/dot-env')
 const { generateToken } = require("../utils/jwt.utils");
 
 const roleService = require("../services/role.services");
-const guestService = require("../services/guest.services");
 const groupService = require("../services/group.services");
 const userService = require("../services/user.services");
 const subscriberService = require("../services/subscriber.services");
@@ -131,8 +130,8 @@ exports.loginSubscriber = async (req, res, next) => {
       httpOnly: true,
       secure: environment === 'production',
       maxAge: 3600 * 1000,
-      sameSite: "Strict",
-      domain: environment === 'production' ? domain : 'localhost'
+      sameSite: "Lax",
+      domain: environment === 'production' ? 'test.maholdiaspora.com' : 'localhost'
     });
 
     res.status(201).json({
@@ -158,7 +157,7 @@ exports.loginStaff = async (req, res, next) => {
       secure: environment === 'production',
       maxAge: 3600 * 1000,
       sameSite: "Strict",
-      domain: environment === 'production' ? domain : 'localhost'
+      domain: environment === 'production' ? 'test-admin.maholdiaspora.com' : 'localhost'
     });
 
     res.status(201).json({
@@ -198,7 +197,7 @@ exports.logoutSubscriber = async (req, res, next) => {
       secure: environment === 'production',
       maxAge: 0,
       sameSite: "Strict",
-      domain: environment === 'production' ? domain : 'localhost'
+      domain: environment === 'production' ? 'test.maholdiaspora.com' : 'localhost'
   });
 
   res.status(200).json({
@@ -221,7 +220,7 @@ exports.logoutStaff = async (req, res, next) => {
       secure: environment === 'production',
       maxAge: 0,
       sameSite: "Strict",
-      domain: environment === 'production' ? domain : 'localhost'
+      domain: environment === 'production' ? 'test-admin.maholdiaspora.com' : 'localhost'
   });
 
   res.status(200).json({
@@ -234,4 +233,3 @@ exports.logoutStaff = async (req, res, next) => {
     next(e)
   }
 }
-
