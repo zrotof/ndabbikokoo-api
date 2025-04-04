@@ -1,30 +1,29 @@
 const { sequelize } = require("../models");
-const { CustomError, NotFoundError } = require("../utils/errors")
+const { CustomError, NotFoundError } = require("../utils/errors");
 
 const staffRequestService = require("../services/staff-request.services");
 const staffService = require("../services/staff.services");
 const subscriberService = require("../services/subscriber.services");
 const mailServices = require("../services/mail.services");
-const roleService = require("../services/role.services")
+const roleService = require("../services/role.services");
 const groupStaffService = require("../services/group-staff.services");
 const groupDelegateService = require("../services/group-delegate.services");
 
 exports.retrieveConnectedStaff = async (req, res, next) => {
   try {
-      const staffId = req.user
+    const staffId = req.user;
 
-      const staff = await staffService.getStaffWithRolesById(staffId);
+    const staff = await staffService.getStaffWithRolesById(staffId);
 
-      return res.status(201).json({
-        status: "success",
-        data: staff,
-        message: "Memebre de staff trouvé",
-      });
-  
+    return res.status(201).json({
+      status: "success",
+      data: staff,
+      message: "Memebre de staff trouvé",
+    });
   } catch (e) {
-      next(e)
+    next(e);
   }
-}
+};
 
 exports.getStaffs = async (req, res, next) => {
   try {
@@ -52,7 +51,7 @@ exports.getStaffGroupsById = async (req, res, next) => {
       status: "success",
       data: groups,
       message: `Liste des groupes trouvée!`,
-    });  
+    });
   } catch (error) {
     next(error);
   }
@@ -64,57 +63,67 @@ exports.getDeputyGroupsById = async (req, res, next) => {
 
     await staffService.getStaffById(staffId);
 
-    const groups = await groupDelegateService.getDeputyGroupsByDeputyId(staffId);
+    const groups = await groupDelegateService.getDeputyGroupsByDeputyId(
+      staffId
+    );
 
     return res.status(200).json({
       status: "success",
       data: groups,
       message: `Liste des groupes trouvée!`,
-    });  
+    });
   } catch (error) {
     next(error);
   }
 };
 
 exports.createStaff = async (req, res, next) => {
-  const transaction = await sequelize.transaction();  
+  const transaction = await sequelize.transaction();
   try {
     const { password, token, email } = req.body;
 
     const staff = await staffService.getStaffByEmail(email);
- 
-    if(staff) {
-      const message = "Un membre du staff associé à cette addresse mail existe déjà!";
+
+    if (staff) {
+      const message =
+        "Un membre du staff associé à cette addresse mail existe déjà!";
       throw new CustomError(message, 409);
     }
 
-    const staffRequest = await staffRequestService.getStaffRequestByEmailAndToken(email, token);
+    const staffRequest =
+      await staffRequestService.getStaffRequestByEmailAndToken(email, token);
 
-    if(!staffRequest){
-      const message = "Nous ne trouvons aucun compte lié. Veuillez contacter le webmaster ";
+    if (!staffRequest) {
+      const message =
+        "Nous ne trouvons aucun compte lié. Veuillez contacter le webmaster ";
       throw new NotFoundError(message);
     }
 
     const staffData = {
       subscriberId: staffRequest.subscriberId,
       email,
-      password
-    }
-    
+      password,
+    };
+
     const staffCreated = await staffService.createStaff(staffData, transaction);
 
-    const roleIds = staffRequest.rolesId.split('|');
+    const roleIds = staffRequest.rolesId.split("|");
 
     await roleService.assignRolesToStaff(staffCreated.id, roleIds, transaction);
 
-    const subscriber = await subscriberService.getSubscriberById(staffRequest.subscriberId);
-    
-    await staffRequestService.deleteStaffRequestBySubscriberId(staffRequest.subscriberId, transaction);
+    const subscriber = await subscriberService.getSubscriberById(
+      staffRequest.subscriberId
+    );
+
+    await staffRequestService.deleteStaffRequestBySubscriberId(
+      staffRequest.subscriberId,
+      transaction
+    );
 
     const mailObject = {
       emailPro: email,
-      firstname: subscriber.firstname
-    }
+      firstname: subscriber.firstname,
+    };
 
     await mailServices.sendSucceedStaffRegisteredMailResponse(mailObject);
 
@@ -129,7 +138,7 @@ exports.createStaff = async (req, res, next) => {
 };
 
 exports.assignGroupsToDelegate = async (req, res, next) => {
-  const transaction = await sequelize.transaction();  
+  const transaction = await sequelize.transaction();
 
   try {
     const { staffId } = req.params;
@@ -140,8 +149,8 @@ exports.assignGroupsToDelegate = async (req, res, next) => {
 
     const groupsDelegateToSave = {
       staffId: deputyId,
-      groupsId
-    }
+      groupsId,
+    };
 
     console.log(groupsDelegateToSave);
 
@@ -153,8 +162,8 @@ exports.assignGroupsToDelegate = async (req, res, next) => {
     if (response) {
       const mailObject = {
         firstname: deputy.subscriber.firstname,
-        emailPro: deputy.email
-      }
+        emailPro: deputy.email,
+      };
 
       await mailServices.sendSucceedGroupAffectationMailResponse(mailObject);
     }
@@ -171,3 +180,41 @@ exports.assignGroupsToDelegate = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.initStaffPasswordReset = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    await staffService.initPasswordReset(email);
+
+    return res.status(201).json({
+      status: "success",
+      data: null,
+      message:
+        "Un email vous permettant de changer votre mot de passe a été envoyé à l'adresse mail renseignée.",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+exports.resetStaffPassword = async (req, res, next) =>{
+
+    try{
+
+        const { token, password } = req.body
+
+        await  staffService.resetStaffPassword(token, password);
+
+        return res.status(201).json(
+            {
+                status : "success",
+                data : null,
+                message : "Mot de passe changé avec succès !"
+            }
+        )
+    }
+    catch(e){
+        next(e)
+    }
+}

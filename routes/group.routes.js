@@ -16,7 +16,7 @@ router.delete('/:id', deleteGroup);
 router.get('/:id/members', getGroupMembersByGroupId);
 router.get('/:id/all', getGroupWithMembersByGroupId);
 router.get('/:id', getGroupById);
-router.get('', passport.authenticate("staff-jwt", { session: false }), getGroups);
 router.post('', createGroup);
+router.get('', passport.authenticate("staff-jwt", { session: false }), getGroups);
 
 module.exports = router;

@@ -13,7 +13,7 @@ const whiteList = [
 
 //Return true of false according to if the url calling the resources is known
 var corsOptionDelegate  = (req, callback) => {
-    var corsOptions;
+    let corsOptions;
 
     if(whiteList.indexOf(req.header('Origin')) !== -1){
         corsOptions = { 

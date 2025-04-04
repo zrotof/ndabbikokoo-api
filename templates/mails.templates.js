@@ -113,6 +113,61 @@ exports.passwordInitialisationRequestTemplate = async (name, token) => {
 `;
 };
 
+exports.staffPasswordInitialisationRequestTemplate = async (name, token) => {
+  return `
+ <html>
+   <head>
+     <style>
+       /* Your CSS styles go here */
+        *{
+          margin: 0;
+          padding: 0;
+          font-family: Arial, sans-serif;
+          box-sizing: border-box;
+          -moz-box-sizing: border-box;
+        }
+        body {
+          background-color: #f2f2f2;
+        }
+       .container {
+         width: 100%;
+         margin: 0 auto;
+         padding: 20px 20px;          
+       }
+       button{
+           padding: 10px 25px;
+           margin-bottom: 15px;
+           background-color : #814b2b;
+           border: none;
+       }
+       .token{
+          display: block;
+          text-decoration: none;
+          font-size: 16px;
+          color: #fff !important;
+          font-weight: bold;
+          background-color : #2a5d46;
+          padding: 10px 25px;
+          margin-bottom: 20px;
+          margin-top: 20px;
+          width: fit-content
+      }
+     </style>
+   </head>
+   <body>
+     <div class="container">
+        <p>Cher(e) ${name},</p>
+        <p>Vous souhaitez changer de mot de passe ? Cliquez sur le bouton ci-dessous.</p>
+        <a class="token" href="${clientAdminBaseUrl}/changer-mot-de-passe?token=${token}" target=blank> Je change mon mot de passe </a>
+        <p>
+          Si vous n'êtes pas à l'origine de cette action, veuillez nous en informer à l'adresse ${o2switch.contact}
+        </p>
+     </div>
+   </body>
+ </html>
+`;
+};
+
 exports.emailVerificationTemplate = async (name, token) => {
   return `
   <html>

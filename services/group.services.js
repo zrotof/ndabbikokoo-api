@@ -7,7 +7,7 @@ class GroupService {
   
   async getGroups(queries) {
     try {
-
+      console.log("here")
       let whereCondition = {}
 
       if(queries.groupType){
@@ -56,6 +56,7 @@ class GroupService {
 
   async getGroupsAffectedToStaff(staffId, queries) {
     try {
+      console.log("not here")
 
       let whereCondition = {}
 
@@ -95,6 +96,7 @@ class GroupService {
           },
           {
             model: models.GroupStaff,
+            as:'groups',
             where: { staffId: staffId },
             attributes: []
           }

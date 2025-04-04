@@ -4,25 +4,14 @@ const roleService = require("../services/role.services");
 exports.getGroups = async (req, res, next) => {
   try {
 
-    const staffId = req.user;
     const queries = req.query;
 
-    const staffRoles = await roleService.getStaffRoles(staffId);
-
-    let groups;
-
-    if (staffRoles.map(role => role.code).includes('admin')) {
-      groups = await groupService.getGroups(queries);
-    } else if (staffRoles.map(role => role.code).includes('deputy')) {
-      groups = await groupService.getGroupsAffectedToStaff(staffId, queries)
-    } else {
-      groups = await groupService.getGroups(queries);
-    }    
-
-    return res.status(201).json({
+    const groups = await groupService.getGroups(queries);
+    
+    return res.status(200).json({
       status: "success",
       data: groups,
-      message: "",
+      message: ""
     });
   } catch (e) {
     next(e);

@@ -8,12 +8,16 @@ const {
   assignStaffToGroup,
   assignGroupsToDelegate,
   getStaffGroupsById,
-  getDeputyGroupsById
+  getDeputyGroupsById,
+  initStaffPasswordReset,
+  resetStaffPassword
 } = require("../controllers/staff.controller");
 
 router.post('/:staffId/assign-group', assignGroupsToDelegate);
 router.get('/:staffId/groups-assigned', getDeputyGroupsById);
 router.get('/:staffId/groups', getStaffGroupsById);
+router.post("/init-password-reset", initStaffPasswordReset);
+router.post('/reset-password', resetStaffPassword);
 router.post("", createStaff);
 router.get(
   "/me",

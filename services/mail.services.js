@@ -16,7 +16,8 @@ const {
   identicationWithAttachmentsMailTemplate,
   staffRequestMailTemplate,
   succeedStaffAccountCreationMailTemplate,
-  succeedGroupAffectationMailTemplate
+  succeedGroupAffectationMailTemplate,
+  staffPasswordInitialisationRequestTemplate
 } = require("../templates/mails.templates");
 
 class MailService {
@@ -74,6 +75,22 @@ class MailService {
     try {
       const subject = "MAHÒL : Changement de mot de passe";
       const message = await passwordInitialisationRequestTemplate(name, token);
+  
+      await transporter.sendMail({
+        from: o2switch.router,
+        to: email,
+        subject: subject,
+        html: message,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async sendStaffPasswordInitilisationMailRequest(name, email, token) {
+    try {
+      const subject = "MAHÒL : Changement de mot de passe";
+      const message = await staffPasswordInitialisationRequestTemplate(name, token);
   
       await transporter.sendMail({
         from: o2switch.router,
