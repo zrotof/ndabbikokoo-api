@@ -38,9 +38,9 @@ class GroupDelegateService {
               "country",
               "createdAt",
               [
-                sequelize.fn("COUNT", sequelize.col("groups->subscriber.id")),
+                sequelize.fn("COUNT", sequelize.fn("DISTINCT", sequelize.col("groups->subscriber.id"))),
                 "subscriberCount"
-              ]
+              ]  
             ],
             include: [
               {
@@ -48,15 +48,15 @@ class GroupDelegateService {
                 as: "subscriber",
                 attributes: []
               }
-            ],
+            ]
           }
         ],
-        group: ["GroupDelegate.id", "groups.id", "groups->subscriber.id"]
-
+        group: ["GroupDelegate.id", "groups.id"]
       });  
 
       const jsonData = existingAssignments.map((item) => item.toJSON());
 
+      console.log("jsonData", jsonData);
       return jsonData.map(({ groups, groupId, ...others }) => ({
         ...others,
         ...groups,

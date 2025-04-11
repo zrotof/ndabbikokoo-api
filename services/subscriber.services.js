@@ -256,6 +256,7 @@ class Subscriber {
 
   async deleteSubscriber(subscriberId) {
     try {
+      
       const subscriber = await models.Subscriber.findByPk(subscriberId);
 
       if (!subscriber) {

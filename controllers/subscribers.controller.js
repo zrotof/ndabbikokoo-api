@@ -19,6 +19,7 @@ const idRequestService = require('../services/id-request.services');
 const mailServices = require('../services/mail.services');
 const subscriberService = require("../services/subscriber.services");
 const userService = require("../services/user.services");
+const satffService = require("../services/staff.services");
 const groupService = require("../services/group.services");
 const idService = require("../services/id-request.services");
 const beneficiaryService = require('../services/beneficiary.services');
@@ -95,9 +96,10 @@ exports.editSubscriberById = async (req, res, next) => {
 
 exports.deleteSubscriber = async (req, res, next) => {
   try {
-    const clientId = req.params.id;
+    const subscriberId = req.params.id;
 
-    await subscriberService.deleteSubscriber(clientId);
+    await satffService.deleteStaffBySubscriberId(subscriberId)
+    await subscriberService.deleteSubscriber(subscriberId);
 
     return res.status(200).json({
       status: "success",
@@ -238,10 +240,10 @@ exports.identification = async (req, res, next) => {
     const idRequest = await idRequestService.getIdRequestByUserId(userId);
     idRequest.files = files;
     idRequest.identificationType = identificationType;
-    idRequest.email = o2switch.idReceiver;
 
     await idRequestService.updateIdRequest(idRequest.id, {isAlreadyUsed: true});
 
+    console.log(idRequest);
     await mailServices.sendEmailIdenticationWithAttachments(idRequest);
 
     return res.status(201).json({

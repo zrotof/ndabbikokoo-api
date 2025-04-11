@@ -1,5 +1,4 @@
-const { clientBaseUrl, clientAdminBaseUrl } = require("../config/dot-env");
-const { o2switch } = require("../config/dot-env");
+const { o2switch, clientBaseUrl, clientAdminBaseUrl } = require("../config/dot-env");
 
 exports.accountValidationTemplate = async (name) => {
   return `

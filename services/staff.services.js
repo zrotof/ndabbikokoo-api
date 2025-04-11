@@ -183,6 +183,28 @@ class StaffService {
     }
   }
 
+  async deleteStaffBySubscriberId(subscriberId) {
+      try {
+        
+        const staff = await models.Staff.findOne(
+          {
+            where: { subscriberId },
+            attributes: ["id"],
+          }
+        );
+  
+        if (!staff) {
+          throw new NotFoundError(
+            "Cet adhérent est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez le webmaster !"
+          );
+        }
+  
+        await staff.destroy();
+      } catch (error) {
+        throw error;
+      }
+    }
+
   async setRoleToStaff(staffId, roleIds, transaction) {
     try {
       const staff = await models.Staff.findByPk(staffId);
@@ -351,6 +373,8 @@ class StaffService {
       throw error;
     }
   };
+
+
 }
 
 module.exports = new StaffService();
