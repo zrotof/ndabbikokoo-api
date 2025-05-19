@@ -87,7 +87,7 @@ class BeneficiaryService {
 
       if (updatedRowCount === 0) {
         throw new NotFoundError(
-          "Le bénéficiaire que vous essayez de modifier est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez Mahol !"
+          "Le bénéficiaire que vous essayez de modifier est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez Ndab Bikokoo !"
         );
       }
 

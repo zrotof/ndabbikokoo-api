@@ -114,7 +114,7 @@ class StaffRequestService {
 
       if (!subscriber) {
         throw new NotFoundError(
-          "Erreur lors de la suppression de la requêtte d'invitation à devenir membre du staff mahol   !"
+          "Erreur lors de la suppression de la requêtte d'invitation à devenir membre du staff Ndab Bikokoo   !"
         );
       }
 

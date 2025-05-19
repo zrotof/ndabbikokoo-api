@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Articles', {
+    await queryInterface.createTable('Planners', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -22,35 +22,21 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      rubricId: {
-        type: Sequelize.INTEGER,
+      type: {
+        type: Sequelize.STRING,
         allowNull: false,
-        references: {
-          model: {
-            tableName: 'Article_Rubrics'
-          },
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-      },
-      title: {
-        type: Sequelize.STRING
-      },
-      description: {
-        type: Sequelize.STRING
       },
       date: {
-        type: Sequelize.DATE,
+        type: Sequelize.STRING,
         allowNull: false
       },
-      hour: {
+      town: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: false
       },
-      content: {
-        type: Sequelize.TEXT,
-        allowNull: false,
+      country: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       hasVideo: {
         type: Sequelize.BOOLEAN,
@@ -60,6 +46,10 @@ module.exports = {
       videoLink: {
         type: Sequelize.TEXT,
         allowNull: true
+      },
+      content: {
+        type: Sequelize.TEXT,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -73,6 +63,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Articles');
+    await queryInterface.dropTable('Planners');
   }
 };

@@ -10,9 +10,7 @@ const logger = require('./config/logger');
 
 const app = express();
 
-
 require("./config/passport")(passport);
-
 
 app.use(cookieParser());
 app.use(helmet());

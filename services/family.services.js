@@ -53,7 +53,7 @@ class FamilyService {
 
       if (updatedRowCount === 0) {
         throw new NotFoundError(
-          "Le membrede famille que vous essayez de modifier est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez Mahol !"
+          "Le membrede famille que vous essayez de modifier est inconnu. Veuillez actualiser la page et re-essayer. Si le problème persiste contactez Ndab Bikokoo !"
         );
       }
 

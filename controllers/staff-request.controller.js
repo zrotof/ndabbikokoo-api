@@ -56,7 +56,7 @@ exports.createStaffRequest = async (req, res, next) => {
     return res.status(201).json({
       status: "success",
       data: null,
-      message: `L'invitation à devenir membre du staff de Mahol a bien été envoyé avec ${subscriber.firstname}`
+      message: `L'invitation à devenir membre du staff de Ndab Bikokoo a bien été envoyé avec ${subscriber.firstname}`
     });
   } catch (e) {
     next(e);

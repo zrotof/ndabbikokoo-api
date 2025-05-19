@@ -137,7 +137,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: false,
         validate: {
           notEmpty: {
-            msg: "Veuillez accepter les statuts, le règlement intérieur et la convention d'adhésion de Mahol!"
+            msg: "Veuillez accepter les statuts, le règlement intérieur et la convention d'adhésion de Ndab Bikokoo!"
           }
         } 
       },
@@ -147,7 +147,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: false,
         validate: {
           notEmpty: {
-            msg: "Veuillez reconnaitre avoir été informé(e) et avoir consentit au traitement de vos données dans la Politique de confidentialité de Mahol"
+            msg: "Veuillez reconnaitre avoir été informé(e) et avoir consentit au traitement de vos données dans la Politique de confidentialité de Ndab Bikokoo"
           }
         }
       }

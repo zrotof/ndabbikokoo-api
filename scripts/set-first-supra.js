@@ -79,7 +79,7 @@ const createSuperAdmin = async () => {
     await transporter.sendMail({
       from: o2switch.router,
       to: 'test@maholdiaspora.com',
-      subject: "MAHÒL : Compte d'administration",
+      subject: "NDAB BIKOKOO : Compte d'administration",
       text: `Votre mot de passe provisoire pour vous connecter à la partie admin est : ${randomPasswordSupra}`,
     });
 

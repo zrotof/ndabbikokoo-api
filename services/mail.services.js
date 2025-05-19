@@ -156,7 +156,7 @@ class MailService {
   async sendGuestInvitationMailRequest(mailObject) {
     try {
       
-      const subject = `Vous êtes invité(e) à rejoindre le groupe ${mailObject.groupName} sur Mahol`
+      const subject = `Vous êtes invité(e) à rejoindre le groupe ${mailObject.groupName} sur Ndab Bikokoo`
   
       const message = await guestInvitationMailTemplate(mailObject.firstname, mailObject.lastname, mailObject.email, mailObject.groupName, mailObject.representantName);
   
@@ -175,7 +175,7 @@ class MailService {
 
   async sendGroupValidationMailResponse(mailObject) {
     try {
-      const subject = `MAHÒL : Validation de votre groupe "${mailObject.groupName}"`;
+      const subject = `NDAB BIKOKOO : Validation de votre groupe "${mailObject.groupName}"`;
   
       const message = await groupValidationMailTemplate(mailObject.groupCreatorName, mailObject.groupName);
   
@@ -192,7 +192,7 @@ class MailService {
 
   async sendEmailIdRequest(name, token, subscriberEmail) {
     try {
-      const subject = `MAHÒL : Vérification de votre identité`;
+      const subject = `NDAB BIKOKOO : Vérification de votre identité`;
   
       const message = await idRequestTemplate(name, token)
 
@@ -235,7 +235,7 @@ class MailService {
   async sendStaffRequestMail(mailObject){
     try {
 
-      const subject = "MAHOL DIASPORA : Accès à votre compte administrateur";
+      const subject = "NDAB BIKOKOO : Accès à votre compte administrateur";
       const message = await staffRequestMailTemplate(mailObject)
 
       await transporter.sendMail({
@@ -253,7 +253,7 @@ class MailService {
   async sendSucceedStaffRegisteredMailResponse(mailObject){
     try {
 
-      const subject = "MAHOL DIASPORA : compte administrateur créé";
+      const subject = "NDAB BIKOKOO : compte administrateur créé";
       const message = await succeedStaffAccountCreationMailTemplate(mailObject.firstname)
 
       await transporter.sendMail({
@@ -271,7 +271,7 @@ class MailService {
   async sendSucceedGroupAffectationMailResponse(mailObject){
     try {
 
-      const subject = "MAHOL DIASPORA : Modification De Groupe ";
+      const subject = "NDAB BIKOKOO : Modification De Groupe ";
       const message = await succeedGroupAffectationMailTemplate(mailObject.firstname)
 
       await transporter.sendMail({

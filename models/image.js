@@ -7,8 +7,9 @@ module.exports = (sequelize, DataTypes) => {
   class Image extends Model {
     static associate(models) {
       Image.belongsTo(models.Article, { foreignKey: "imageableId", constraints: false, as: "article" });
-      Image.belongsTo(models.User, { foreignKey: "imageableId", constraints: false });
+      Image.belongsTo(models.Planner, { foreignKey: "imageableId", constraints: false, as: "planner" });
       Image.belongsTo(models.Subscriber, { foreignKey: "imageableId", constraints: false, as: "image" });
+      Image.belongsTo(models.User, { foreignKey: "imageableId", constraints: false });
     }
   }
 

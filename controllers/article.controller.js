@@ -1,4 +1,4 @@
-const { models, sequelize } = require("../models/index");
+const { sequelize } = require("../models/index");
 
 const articleService = require("../services/article.services");
 const imageService = require("../services/image.services");

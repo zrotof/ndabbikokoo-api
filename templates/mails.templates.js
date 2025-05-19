@@ -358,7 +358,7 @@ exports.guestInvitationMailTemplate = async (
       <div class="container">
         <p>Bonjour ${firstname} ${lastname},</p>
         <p>
-          Vous avez été invité(e) par ${representantName} à rejoindre le groupe ${groupName} sur notre plateforme Mahol Diaspora. 
+          Vous avez été invité(e) par ${representantName} à rejoindre le groupe ${groupName} sur notre plateforme Ndab Bikokoo. 
           Ce groupe vous permettra de [bénéfices ou objectifs du groupe, par ex. : partager des idées, collaborer, accéder à des ressources exclusives].
         </p>
         <br>
@@ -387,7 +387,7 @@ exports.guestInvitationMailTemplate = async (
         </p>
         <br>
         <p>
-          L’équipe Mahol
+          L’équipe Ndab Bikokoo
         </p>
       </div>
     </body>
@@ -433,7 +433,7 @@ exports.groupValidationMailTemplate = async (groupCreatorName, groupName) => {
       <div class="container">
         <p>Bonjour ${groupCreatorName},</p>
         <p>
-          Votre groupe ${groupName} a été validé par les administrateurs de Mahol. 
+          Votre groupe ${groupName} a été validé par les administrateurs de Ndab Bikokoo. 
           En vous connectant vous aurez la possibilité d'inviter des membres à rejoindre votre groupe. 
         </p>
         <br>
@@ -448,7 +448,7 @@ exports.groupValidationMailTemplate = async (groupCreatorName, groupName) => {
         </p>
         <br>
         <p>
-          L’équipe Mahol
+          L’équipe Ndab Bikokoo
         </p>
       </div>
     </body>
@@ -514,7 +514,7 @@ exports.idRequestTemplate = async (subscriberName, token) => {
         </p>
         <br>
         <p>
-          L’équipe Mahol
+          L’équipe Ndab Bikokoo
         </p>
       </div>
     </body>
@@ -586,7 +586,7 @@ exports.identicationWithAttachmentsMailTemplate = async (
         </p>
         <br>
         <p>
-          L’équipe Mahol
+          L’équipe Ndab Bikokoo
         </p>
       </div>
     </body>
@@ -638,7 +638,7 @@ exports.staffRequestMailTemplate = async (mailObject) => {
     <body>
       <div class="container">
         <p class="greeting">Cher(e) ${mailObject.firstname},</p>
-        <p>Vous avez étés invités à rejoindre le staff de Mahol Diaspora avec pour rôle(s) : ${mailObject.roleStringifiedNames}. </p>
+        <p>Vous avez étés invités à rejoindre le staff de Ndab Bikokoo avec pour rôle(s) : ${mailObject.roleStringifiedNames}. </p>
         <p>Pour accéder à votre espace d'administration, veuillez cliquer sur le lien ci-dessous et définir votre mot de passe.</p>
         <a class="token" href="${clientAdminBaseUrl}/staffs/valider-invitations?firstname=${mailObject.firstname}&email=${mailObject.emailPro}&token=${mailObject.token}" target="_blank"> Je définis mon mot de passe </a>
         <p>
@@ -694,7 +694,7 @@ exports.succeedStaffAccountCreationMailTemplate = async (firstname) => {
     <body>
       <div class="container">
         <p class="greeting">Cher(e) ${firstname},</p>
-        <p>Félicitation, vous faites désormais partie du staff de Mahol </p>
+        <p>Félicitation, vous faites désormais partie des adhérents de Ndab Bikokoo </p>
         <p>Pour accéder à votre espace d'administration, veuillez cliquer sur le lien ci-dessous et vous connecter</p>
         <a class="token" href="${clientAdminBaseUrl}/se-connecter" target="_blank">Se Connecter</a>
         <p>
