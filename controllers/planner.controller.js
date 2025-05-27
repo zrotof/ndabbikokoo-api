@@ -1,7 +1,6 @@
 const { sequelize } = require("../models/index");
 
 const plannerService = require("../services/planner.services");
-const articleService = require("../services/article.services");
 const imageService = require("../services/image.services");
 
 const imageableTypeEnum = require("../enums/imageable-types.enum");

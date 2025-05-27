@@ -7,8 +7,6 @@ class PlannerService {
   async getPlanners(params) {
     try {
 
-      console.log(params)
-
       let queryOptions = {};
       let conditions = {};
 
@@ -17,7 +15,6 @@ class PlannerService {
       }
 
       if(params?.type){
-        console.log(params?.type)
         conditions.type = params.type
       }
 

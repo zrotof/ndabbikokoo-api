@@ -4,6 +4,7 @@ const cors = require('cors');
 const whiteList = [
     'http://localhost:4200',
     'http://localhost:4201',
+    'http://localhost:4202',
     'https://shadow.ndabbikokoo.com',
     'https://admin-test.ndabbikokoo.com'
 ];

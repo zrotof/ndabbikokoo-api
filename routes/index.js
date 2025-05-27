@@ -12,6 +12,7 @@ const staffRequestRoute = require('./staff-request.routes');
 const staffRoute = require('./staff.routes');
 const subscriberRoutes = require('./subscriber.routes');
 const userRoutes = require('./user.routes');
+const testimonyRoutes = require('./testimony.routes');
 
 router.use("/auth", authRoutes);
 router.use("/blog/articles", articleRoute);
@@ -21,6 +22,7 @@ router.use("/groups", groupRoutes);
 router.use("/roles", roleRoutes);
 router.use("/blog/rubrics", rubricRoute);
 router.use("/planners", plannerRoute);
+router.use("/testimonies", testimonyRoutes);
 router.use('/staffs-requests', staffRequestRoute);
 router.use("/staffs", staffRoute);
 router.use("/subscribers", subscriberRoutes);
