@@ -7,10 +7,12 @@ class RubricService {
       const whereCondition = {};
 
       if (queryParams.isActive && queryParams.isActive !== undefined) {
-        whereCondition.isActive = true;
+        whereCondition.isActive = queryParams.isActive === 'true' || queryParams.isActive === true;
       }
 
-      const rubrics = await models.ArticleRubric.findAll();
+      const rubrics = await models.ArticleRubric.findAll({
+        where: whereCondition,
+      });
 
       return rubrics;
     } catch (e) {

@@ -3,7 +3,7 @@ const articleRubricService = require("../services/rubric.services");
 exports.getRubrics = async (req, res) => {
   try {
     const queryParams = { ...req.query };
-
+    
     const rubrics = await articleRubricService.getRubrics(queryParams);
 
     return res.status(200).json({
