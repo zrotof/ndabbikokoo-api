@@ -14,7 +14,7 @@ class PlannerService {
         conditions.rubricId = params.rubricId;
       }
 
-      if(params?.type){
+      if (params?.type) {
         conditions.type = params.type
       }
 
@@ -22,9 +22,17 @@ class PlannerService {
         queryOptions.limit = parseInt(params.limit);
       }
 
+      if (params?.startDate) {
+        conditions.dateStart = {
+          [models.Sequelize.Op.gte]: new Date(params.startDate)
+        };
+      }
+
+      const orderDirection = params?.startDate ? "ASC" : "DESC";
+      queryOptions.order = [["dateStart", orderDirection]];
 
       queryOptions.attributes = { exclude: ["UserId"] };
-      queryOptions.order = [["date", "DESC"]];
+      queryOptions.order = [["dateStart", "DESC"]];
       queryOptions.where = conditions;
 
       const planners = await models.Planner.findAll(
@@ -40,19 +48,19 @@ class PlannerService {
         }
       );
 
-      const formattedArticles = planners.map(planner => {
-        const cleanArticle = planner.get({ plain: true }); // Supprime les références circulaires
+      const formattedPlanners = planners.map(planner => {
+        const cleanPlanner = planner.get({ plain: true }); // Supprime les références circulaires
 
-        const coverImage =  cleanArticle.Image?.url || null      
-        delete cleanArticle.Image;
+        const coverImage = cleanPlanner.Image?.url || null
+        delete cleanPlanner.Image;
 
-        return { 
-            ...cleanArticle, 
-            coverImage
+        return {
+          ...cleanPlanner,
+          coverImage
         };
-    });
-    
-      return formattedArticles
+      });
+
+      return formattedPlanners
     } catch (e) {
       throw e;
     }
@@ -74,7 +82,7 @@ class PlannerService {
     }
   }
 
-  async getPlannerById(plannerId){
+  async getPlannerById(plannerId) {
     try {
       const planner = await models.Planner.findByPk(plannerId,
         {
@@ -87,21 +95,21 @@ class PlannerService {
           ]
         }
       )
-        
-      if(!planner){
+
+      if (!planner) {
         throw new NotFoundError('Évênement non trouvé');
       }
 
       const cleanArticle = planner.get({ plain: true });
 
       const formattedArticle = {
-        ...cleanArticle, 
+        ...cleanArticle,
         coverImage: cleanArticle.Image?.url || null
-    };
+      };
 
-    delete cleanArticle.Image;
+      delete cleanArticle.Image;
 
-    return formattedArticle
+      return formattedArticle
 
     } catch (error) {
       throw e
@@ -131,18 +139,18 @@ class PlannerService {
     }
   }
 
-  async updatePlanner(plannerId, data){
+  async updatePlanner(plannerId, data) {
     try {
-      const updatedPlanner = await models.Planner.update(data, 
+      const updatedPlanner = await models.Planner.update(data,
         {
-          where: { 
-            id: plannerId 
+          where: {
+            id: plannerId
           }
         }
       );
 
-      if(!updatedPlanner){
-        throw new NotFoundError("Évênement inconnu !");  
+      if (!updatedPlanner) {
+        throw new NotFoundError("Évênement inconnu !");
       }
 
       return updatedPlanner;
@@ -154,11 +162,11 @@ class PlannerService {
   async deletePlanner(plannerId) {
     try {
       const planner = await models.Planner.findByPk(plannerId);
-  
+
       if (!planner) throw new Error("Évênement non trouvé");
-  
+
       await planner.destroy();
-    
+
     } catch (e) {
       throw e
     }

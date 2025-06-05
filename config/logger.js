@@ -5,7 +5,7 @@ const { environment } = require("./dot-env");
 
 const isDevelopment = environment === "development";
 
-const logsDir = isDevelopment ? "logs" : "/home/dmfm5155/logs/mahol";
+const logsDir = isDevelopment ? "logs" : "/home/sc1bema0694/logs/ndab";
 
 const customFormat = winston.format.printf(
   ({ level, message, timestamp, ...meta }) => {

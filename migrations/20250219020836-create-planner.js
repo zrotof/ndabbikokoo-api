@@ -26,8 +26,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      date: {
-        type: Sequelize.STRING,
+      dateStart: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      dateEnd: {
+        type: Sequelize.DATE,
         allowNull: false
       },
       town: {

@@ -29,6 +29,11 @@ class ArticleService {
               model: models.Image,
               required: false,
               attributes: ["url"]
+            },
+            {
+              model: models.ArticleRubric,
+              as: 'rubric',
+              attributes: ["id", "name"]
             }
           ]
         }
@@ -39,9 +44,9 @@ class ArticleService {
 
         const coverImage =  cleanArticle.Image?.url || null      
         delete cleanArticle.Image;
-
+        const {rubricId , ...rest} = cleanArticle;
         return { 
-            ...cleanArticle, 
+            ...rest, 
             coverImage// Ajout de coverImage et suppression de Image
         };
     });

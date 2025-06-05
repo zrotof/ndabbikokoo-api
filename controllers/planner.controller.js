@@ -8,9 +8,9 @@ const imageableTypeEnum = require("../enums/imageable-types.enum");
 exports.getPlanners = async (req, res, next) => {
   try {
 
-    const {type} = req.query;
+    const { type } = req.query;
 
-    const planners = await plannerService.getPlanners({type});
+    const planners = await plannerService.getPlanners({ type });
 
     return res.status(200).json({
       status: "success",
@@ -61,7 +61,8 @@ exports.createPlanner = async (req, res, next) => {
 
     const plannerData = {
       type: req.body.type,
-      date: req.body.date,
+      dateStart: req.body.dateStart,
+      dateEnd: req.body.dateEnd, 
       town: req.body.town,
       country: req.body.country,
       hasVideo: req.body.hasVideo,
@@ -75,7 +76,7 @@ exports.createPlanner = async (req, res, next) => {
       transaction
     );
 
-    const folder= 'planners';
+    const folder = 'planners';
 
     await imageService.uploadImage(
       file,
@@ -108,8 +109,8 @@ exports.updatePlanner = async (req, res, next) => {
     if (file) {
       const image = await imageService.getImageByUrl(planner.coverImage);
       await imageService.deleteImage(image.id, image.publicId);
-      
-      const folder= 'planners';
+
+      const folder = 'planners';
 
       await imageService.uploadImage(
         file,
@@ -140,7 +141,7 @@ exports.deletePlanner = async (req, res, next) => {
   try {
     const plannerId = req.params.id;
     const planner = await plannerService.getPlannerById(plannerId);
-    
+
     const image = await imageService.getImageByUrl(planner.coverImage);
     await imageService.deleteImage(image.id, image.publicId);
 

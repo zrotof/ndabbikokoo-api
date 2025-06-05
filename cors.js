@@ -6,7 +6,9 @@ const whiteList = [
     'http://localhost:4201',
     'http://localhost:4202',
     'https://shadow.ndabbikokoo.com',
-    'https://admin-test.ndabbikokoo.com'
+    'https://www.shadow.ndabbikokoo.com',
+    'https://dev-admin.ndabbikokoo.com',
+    'https://www.dev-admin.ndabbikokoo.com'
 ];
 
 //Return true of false according to if the url calling the resources is known
